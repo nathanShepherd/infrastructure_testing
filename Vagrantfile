@@ -9,9 +9,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "server" do |server|
 
-    server.vm.box = "generic/centos7"
+    server.vm.box = "geerlingguy/centos7"
 
-    server.vm.network "private_network", type: "dhcp"
+    server.vm.network "private_network", ip: "172.28.128.3"
 
     server.vm.hostname = "server"
 
@@ -27,6 +27,8 @@ Vagrant.configure("2") do |config|
        cd pscheduler
        sudo make
 
+       sudo systemctl stop firewalld
+
     SHELL
 
   end
@@ -35,9 +37,9 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "guest" do |guest|
 
-      guest.vm.box = "generic/centos7"
+      guest.vm.box = "geerlingguy/centos7"
 
-      guest.vm.network "private_network", type: "dhcp"
+      guest.vm.network "private_network", ip: "172.28.128.4"
 
       guest.vm.hostname = "guest"
 
@@ -53,6 +55,7 @@ Vagrant.configure("2") do |config|
         cd pscheduler
         sudo make
 
+        sudo systemctl stop firewalld
 
     SHELL
 
