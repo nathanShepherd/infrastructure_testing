@@ -11,11 +11,13 @@ Vagrant.configure("2") do |config|
 
     server.vm.box = "geerlingguy/centos7"
 
-    server.vm.network "private_network", ip: "172.28.128.3"
+    server.vm.network "public_network", ip: "172.28.128.3" #type: "dhcp"
 
     server.vm.hostname = "server"
 
     server.vm.provision "shell", inline: <<-SHELL
+
+       route add default gw 35.0.48.1
 
        sudo curl -s -O https://raw.githubusercontent.com/perfsonar/pscheduler/master/scripts/system-prep
 
@@ -39,7 +41,7 @@ Vagrant.configure("2") do |config|
 
       guest.vm.box = "geerlingguy/centos7"
 
-      guest.vm.network "private_network", ip: "172.28.128.4"
+      guest.vm.network "public_network", ip: "172.28.128.4"
 
       guest.vm.hostname = "guest"
 
