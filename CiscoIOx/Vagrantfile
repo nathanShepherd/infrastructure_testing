@@ -1,0 +1,29 @@
+
+# Network Infrastructure testing for pScheduler
+# Developed by Nathan Shepherd for UofM:ITS
+
+# -*- mode: ruby -*-
+# # vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define "server" do |server|
+
+    server.vm.box = "geerlingguy/centos7"
+
+    server.vm.network "public_network", ip: "172.28.128.3" #type: "dhcp"
+
+    server.vm.hostname = "server"
+
+    server.vm.provision "shell", inline: <<-SHELL
+
+
+       sudo yum install -y git
+
+#       sudo systemctl stop firewalld
+
+    SHELL
+
+  end # vm.define
+
+end # configure 
