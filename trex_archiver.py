@@ -1,4 +1,4 @@
-
+from os import listdir
 
 def read_file(test_file, out_json, test_type):
   in_arr = []
@@ -70,36 +70,85 @@ def read_file(test_file, out_json, test_type):
   out_json[test_type][test_file] = json
   
 
+#%%%%%%%%%%%%%%%%%%%%%%%%
+# Populate archive from keys in json and directories in ./
 
-json = {"http_simple":{},
-	"imix_64_100k":{},
-  	"sfr_delay_10_1g":{},
-	"sfr_delay_10_1g_no_bundeling":{}}
+def collect_archive(archive):
+  json = {"pS_thruput":{},
+          "http_simple":{},
+          "imix_64_100k":{},
+    	  "sfr_delay_10_1g":{},
+	  "sfr_delay_10_1g_no_bundeling":{}}
+
   
-from os import listdir
+
+  for dir in listdir('./'):
+    if dir.find('.') == -1 and dir != "initial_testing":
+      for file in listdir('./' + dir):
+
+        print("Reading output from testtype "+ dir +" file "+ file)
+        read_file(dir +'/'+ file, json, dir)
+
+
+  simple_stats = {"ports":{"0":{"ibytes":[],"obytes":[],"Tx":[]},
+                           "1":{"ibytes":[],"obytes":[],"Tx":[]}},
+                  "average-latency":[], "maximum-latency":[],
+                  "Total-pkt-drop":[], "Total-tx-bytes":[],
+                  "Total-Tx":[],"CpuUtilization":[]}
+
+  tags = ["sfr_delay_10_1g_no_bundeling",
+         "sfr_delay_10_1g",
+         "imix_64_100k" ,
+         "http_simple",
+         "pS_thruput",]
   
-for dir in listdir('./'):
-  if dir.find('.') == -1 and dir != "initial_testing":
-    for file in listdir('./' + dir):
-      print("Reading output from testtype "+ dir +" file "+ file)
-      read_file(dir +'/'+ file, json, dir)
+  encode = {"Total-Tx":"Total-Tx (Mbps)",
+            "maximum-latency":"maximum-latency (usec)",
+            "Total-pkt-drop":"Total-pkt-drop (pkts)",
+            "Total-tx-bytes":"Total-tx-bytes (bytes)",
+            "average-latency":"average-latency (usec)",
+            "CpuUtilization":"CpuUtilization (GB/core)",}
 
-#print(json)
+  for tag in tags:
+    print("Archiving test " + tag)
 
-simple_stats = {"ports":{"0":{"ibytes":[],"obytes":[],"Tx":[]},
-                         "1":{"ibytes":[],"obytes":[],"Tx":[]}},
-                "average-latency":[], "maximum-latency":[],
-                "Total-pkt-drop":[], "Total-tx-bytes":[],
-                "Total-Tx":[],"CpuUtilization":[]}
+    temp = {}
+    for title in simple_stats:
+      if title != "ports":
+        temp[encode[title]] = []
+      else:
+        temp["ports"] = simple_stats["ports"]
+    
+    for file in json[tag]:
+      for stat in json[tag][file]:
+        if stat == "port : 0 ":
+          for top in simple_stats["ports"]["0"]:
+            temp["ports"]["0"][top].append(json[tag][file]["port : 0 "][top])
+        elif stat == "port : 1 ":
+          for top in simple_stats["ports"]["1"]:
+            temp["ports"]["1"][top].append(json[tag][file]["port : 1 "][top])
 
-# "port : 0 "
+        else:
+          for metric in json[tag][file][stat]:
+            if metric in simple_stats:              
+              temp[encode[metric]].append(json[tag][file][stat][metric])
 
+    archive[tag] = temp
+
+if __name__ == "__main__":
+  archive = {}
+  collect_archive(archive)
+
+
+
+'''
 ######[ change simple stats directory here ]######
 # "sfr_delay_10_1g_no_bundeling"
 # "sfr_delay_10_1g"
 # "imix_64_100k" 
 # "http_simple"
-tag = "http_simple"
+# "pS_thruput"
+tag = "pS_thruput"
 
 for file in json[tag]:
   for stat in json[tag][file]:
@@ -117,27 +166,27 @@ for file in json[tag]:
 
 print(simple_stats)
 
-#import json
-#output = json.dumps(simple_stats,
-#                    sort_keys=True, indent=4, separators=(',', ':'))
-
-for t in simple_stats:
-  print(t)
-  for tt in simple_stats[t]:
-    if t == "Total-tx-bytes":
-      tt = str(float(tt.split("bytes")[0]) / 10000000000) + " GB"
-    if t == "CpuUtilization":
-      tt = tt.split("Gb/core")[0].split("%")
-      tt = tt[0] +" % "+ tt[1] + " Gb/core"
+def viz_simple_stats(simple_stats):
+  print("Displaying simplified statistics for test " + tag)
+  for t in simple_stats:
+    print(t)
+    for tt in simple_stats[t]:
+      if t == "Total-tx-bytes":
+        tt = str(float(tt.split("bytes")[0]) / 10000000000) + " GB"
+      if t == "CpuUtilization":
+        tt = tt.split("Gb/core")[0].split("%")
+        tt = tt[0] +" % "+ tt[1] + " Gb/core"
        
-    print("\t" + tt)
+      print("\t" + tt)
 
-    if tt in ["0", "1"]:
-      for ttt in simple_stats[t][tt]:
-        print("\t" + ttt)
-        for tttt in simple_stats[t][tt][ttt]:
-          print("\t\t" + tttt)
+      if tt in ["0", "1"]:
+        for ttt in simple_stats[t][tt]:
+          print("\t" + ttt)
+          for tttt in simple_stats[t][tt][ttt]:
+            print("\t\t" + tttt)
 
+viz_simple_stats()
+'''
 '''
 for r in json:
   print(r)
