@@ -8,6 +8,7 @@ _exe = "./t-rex-64 "
 
 
 T = {"pS_thruput":"",
+     "initial_testing":_exe +"-f cap2/http_simple.yaml -c 4 -m 10 -d 1 -l 1000",
 
      "imix_64_100k": _exe +"-f cap2/imix_64_100k.yaml -c 4 -m 2 -d 60 -l 1000",
 
@@ -26,10 +27,11 @@ def link(title):
         out = "/root/" + title +'/'+ title +'_'+ stamp
         system("touch " + out)
 
-        if title not in ["pS_thruput", "initial_testing"]:
+        if title in T:
                 system(T[title] + " > " + out)
 
-        print("Created file: " + out + " in " + str(round(time() - ts)) + " seconds")
+        print("Created file: " + out + " in " + str(round(time() - ts,1)) + " seconds")
 
 if __name__ == "__main__":
-        link("http_simple")
+        link("initial_testing")
+
