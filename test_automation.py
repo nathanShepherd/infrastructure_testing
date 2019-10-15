@@ -2,20 +2,34 @@ from os import system
 from time import time
 import datetime
 
-'''
-initial_testing   sfr_delay_10_1g
-http_simple       sfr_delay_10_1g_no_bundeling
-imix_64_100k     pS_thruput
-'''
-timestp = datetime.datetime.fromtimestamp
-
-ts = time()
-stamp = timestp(ts).strftime("%d%b%Y_%Hh%Mm%Ss")
-
-out = "/root/initial_testing/" + stamp
-system("touch " + out)
-
+timestmp = datetime.datetime.fromtimestamp
+no_bundle = "sfr_delay_10_1g_no_bundeling"
 _exe = "./t-rex-64 "
-system(_exe + "-f cap2/http_simple.yaml -c 4 -m 100 -d 1 -l 1000 > " + out)
 
-print("Created file: " + out + " in " + str(round(time() - ts)) + " seconds")
+
+T = {"pS_thruput":"",
+
+     "imix_64_100k": _exe +"-f cap2/imix_64_100k.yaml -c 4 -m 2 -d 60 -l 1000",
+
+     no_bundle:_exe +"-f avl/"+ no_bundle +".yaml -c 4 -m 20 -d 60 -l 1000 --ipv6",
+
+     "sfr_delay_10_1g": _exe +"-f avl/sfr_delay_10_1g.yaml -c 4 -m 35 -d 100 -p",
+
+     "http_simple": _exe +"-f cap2/http_simple.yaml -c 4 -m 100 -d 30 -l 1000"}
+
+def link(title):
+        ''' Execute one test given the title definition '''
+
+        ts = time()
+        stamp = timestmp(ts).strftime("%d%b%Y_%Hh%Mm%Ss")
+
+        out = "/root/" + title +'/'+ title +'_'+ stamp
+        system("touch " + out)
+
+        if title not in ["pS_thruput", "initial_testing"]:
+                system(T[title] + " > " + out)
+
+        print("Created file: " + out + " in " + str(round(time() - ts)) + " seconds")
+
+if __name__ == "__main__":
+        link("http_simple")
