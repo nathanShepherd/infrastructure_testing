@@ -14,7 +14,7 @@ T = {"pS_thruput":"",
 
      no_bundle:_exe +"-f avl/"+ no_bundle +".yaml -c 4 -m 20 -d 60 -l 1000 --ipv6",
 
-     "sfr_delay_10_1g": _exe +"-f avl/sfr_delay_10_1g.yaml -c 4 -m 35 -d 100 -p",
+     "sfr_delay_10_1g":_exe+"-f avl/sfr_delay_10_1g.yaml -c 4 -m 35 -d 100 -l 1000 -p",
 
      "http_simple": _exe +"-f cap2/http_simple.yaml -c 4 -m 100 -d 30 -l 1000"}
 
@@ -34,4 +34,3 @@ def link(title):
 
 if __name__ == "__main__":
         link("initial_testing")
-
