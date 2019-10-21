@@ -107,18 +107,21 @@ def collect_archive(archive):
             "Total-pkt-drop":"Total-pkt-drop (pkts)",
             "Total-tx-bytes":"Total-tx-bytes (bytes)",
             "average-latency":"average-latency (usec)",
-            "CpuUtilization":"CpuUtilization (GB/core)",}
+            "CpuUtilization":"CpuUtilization"}# CPU has 2 units
 
   for tag in tags:
     print("Archiving test " + tag)
 
-    temp = {}
+    # Store read test entries in arrays
+    temp = {"Total-tx-bytes (MB)":[]}
+
     for title in simple_stats:
-      if title != "ports":
+      if title not in ["ports", "Total-tx-bytes"]:
         temp[encode[title]] = []
       else:
         temp["ports"] = simple_stats["ports"]
     
+    # Reading statistics from filesystem
     for file in json[tag]:
       for stat in json[tag][file]:
         if stat == "port : 0 ":
@@ -127,91 +130,32 @@ def collect_archive(archive):
         elif stat == "port : 1 ":
           for top in simple_stats["ports"]["1"]:
             temp["ports"]["1"][top].append(json[tag][file]["port : 1 "][top])
-
         else:
           for metric in json[tag][file][stat]:
-            if metric in simple_stats:              
-              temp[encode[metric]].append(json[tag][file][stat][metric])
+            if metric in simple_stats:
+              # Remove units from test statistics
+
+              entry = json[tag][file][stat][metric]
+              if metric == encode[metric] or entry == "":
+                temp[encode[metric]].append(entry)
+                continue
+
+              units = encode[metric].split('(')[-1][:-1]
+              num = entry.split(units)[0]
+
+              if metric == "Total-pkt-drop": 
+                num = int(num) 
+              elif metric != "Total-tx-bytes":
+                num = float(num)
+              else:
+                num = float(num) * 0.000001 # convert bytes to MB
+                temp["Total-tx-bytes (MB)"].append( num)
+                continue
+
+              temp[encode[metric]].append(num)
 
     archive[tag] = temp
 
 if __name__ == "__main__":
   archive = {}
   collect_archive(archive)
-
-
-
-'''
-######[ change simple stats directory here ]######
-# "sfr_delay_10_1g_no_bundeling"
-# "sfr_delay_10_1g"
-# "imix_64_100k" 
-# "http_simple"
-# "pS_thruput"
-tag = "pS_thruput"
-
-for file in json[tag]:
-  for stat in json[tag][file]:
-    if stat == "port : 0 ":
-      for top in simple_stats["ports"]["0"]:
-        simple_stats["ports"]["0"][top].append(json[tag][file]["port : 0 "][top])
-    elif stat == "port : 1 ":
-      for top in simple_stats["ports"]["1"]:
-        simple_stats["ports"]["1"][top].append(json[tag][file]["port : 1 "][top])
-
-    else:
-      for metric in json[tag][file][stat]:
-        if metric in simple_stats:
-          simple_stats[metric].append(json[tag][file][stat][metric])
-
-print(simple_stats)
-
-def viz_simple_stats(simple_stats):
-  print("Displaying simplified statistics for test " + tag)
-  for t in simple_stats:
-    print(t)
-    for tt in simple_stats[t]:
-      if t == "Total-tx-bytes":
-        tt = str(float(tt.split("bytes")[0]) / 10000000000) + " GB"
-      if t == "CpuUtilization":
-        tt = tt.split("Gb/core")[0].split("%")
-        tt = tt[0] +" % "+ tt[1] + " Gb/core"
-       
-      print("\t" + tt)
-
-      if tt in ["0", "1"]:
-        for ttt in simple_stats[t][tt]:
-          print("\t" + ttt)
-          for tttt in simple_stats[t][tt][ttt]:
-            print("\t\t" + tttt)
-
-viz_simple_stats()
-'''
-'''
-for r in json:
-  print(r)
-  for r2 in json[r]:
-    print(r2)
-    for r3 in json[r][r2]:
-      print("\t" + r3)
-      for r4 in json[r][r2][r3]:
-        print("\t" + r4)
-        print("\t\t" + json[r][r2][r3][r4])
-'''
-
-# Output test statistics
-'''
-for lay1 in json:
-  print(lay1)
-
-  temp = ""
-  for stat in json[lay1]:
-    if lay != "ports":
-      temp += stat + "\t" + json[lay1][stat] + "\n"
-    else:
-      for metric in json[lay1][stat]:
-        temp += metric + "\t" + stat + "\t" + simple_stats[
-
-  print(temp)
-'''
-
