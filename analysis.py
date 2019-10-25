@@ -40,11 +40,9 @@ def title_stats(json):
         outs = {}
 	for title in json:
 		outs[title] = {}
-		print(title) #########
 		for test in json[title]:
                         outs[title][test] = {}
                         entries = json[title][test]
-			print(entries)#########
 			if '' in entries:
 				continue
 
@@ -76,3 +74,4 @@ if __name__ == "__main__":
 
 	hive_stat = title_stats(hive)
         print_gen_stats(hive_stat)
+
