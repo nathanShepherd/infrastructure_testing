@@ -18,7 +18,7 @@ T = {"pS_thruput":"",
 
      "sfr_delay_10_1g":_exe+"-f avl/sfr_delay_10_1g.yaml -c 4 -m 35 -d 100 -l 1000 -p",
 
-     "http_simple": _exe +"-f cap2/http_simple.yaml -c 4 -m 100 -d 30 -l 1000"}
+     "http_simple": _exe +"-f cap2/http_simple.yaml -c 4 -m 100 -d 1 -l 1000"}
 
 def link(title):
         ''' Execute one test given the title definition '''
@@ -38,4 +38,4 @@ def link(title):
 	print(out)
 
 if __name__ == "__main__":
-	link("initial_testing")
+	link("http_simple")
