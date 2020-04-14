@@ -3,7 +3,7 @@ from os import listdir
 
 def read_file(test_file, out_json, test_type):
   in_arr = []
-  with open(test_file, "rb") as f:
+  with open(test_file, "r") as f:
     in_arr = f.read().split("\n")
 
   divide = 0
@@ -84,9 +84,9 @@ def collect_archive(archive):
   
 
   for dir in listdir('./'):
-    if dir.find('.') == -1 and dir != "initial_testing":
+    if dir.find('.') == -1 and dir not in ["initial_testing", "__pycache__"]:
       for file in listdir('./' + dir):
-
+                 
         print("Reading output from testtype "+ dir +" file "+ file)
         read_file(dir +'/'+ file, json, dir)
 
