@@ -6,9 +6,10 @@ timestmp = datetime.datetime.fromtimestamp
 no_bundle = "sfr_delay_10_1g_no_bundeling"
 _exe = "./t-rex-64 "
 
-# TODO: Where to store testing database (git)
-#	Define dictionary T in separate file
+# TODO:	Define dictionary T in separate yaml file
 
+# Dictionary T (test) defines each test including the associated executable
+# Usage: T[ testname ] returns TRex command for test type "testname"
 T = {"pS_thruput":"",
      "initial_testing":_exe +"-f cap2/http_simple.yaml -c 4 -m 10 -d 1 -l 1000",
 
@@ -24,13 +25,16 @@ def link(title):
         ''' Execute one test given the title definition '''
 	''' Creates text file with TRex output from test'''
 
+	# Get current time and create timestamp
 	ts = time()
 	stamp = timestmp(ts).strftime("%d%b%Y_%Hh%Mm%Ss")
 
+	# Create file to store output of test "title"
 	out = "/opt/trex/v2.59/test_dir/"
 	out = out + title +'/'+ title +'_'+ stamp
 	system("touch " + out)
 
+	# Execute test and store in the above created file
         if title in T:
 		system(T[title] + " > " + out)
 
