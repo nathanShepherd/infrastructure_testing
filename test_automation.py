@@ -5,6 +5,7 @@ import datetime
 timestmp = datetime.datetime.fromtimestamp
 no_bundle = "sfr_delay_10_1g_no_bundeling"
 _exe = "./t-rex-64 "
+OUT = "/opt/trex/v2.59/test_dir/"
 
 # TODO:	Define dictionary T in separate yaml file
 
@@ -30,8 +31,7 @@ def link(title):
 	stamp = timestmp(ts).strftime("%d%b%Y_%Hh%Mm%Ss")
 
 	# Create file to store output of test "title"
-	out = "/opt/trex/v2.59/test_dir/"
-	out = out + title +'/'+ title +'_'+ stamp
+	out = OUT + title +'/'+ title +'_'+ stamp
 	system("touch " + out)
 
 	# Execute test and store in the above created file
@@ -41,5 +41,48 @@ def link(title):
 	print("Created file: in " + str(round(time() - ts,1)) + " seconds")
 	print(out)
 
+def get_multiplier_data_pts(title):
+	''' Create directories in dir_name to create multiple files '''
+	
+	dir_name = "multi_" + title
+	out = OUT + dir_name
+	system("mkdir " + out)
+
+        max_multi = 100
+	step_multi = 10
+	num_test = 3
+	ts = time()
+
+	for m in range(1, max_multi, step_multi):
+		ts = time()
+		sub_dir = out +'/'+ 'm' + str(m)
+		
+		system("mkdir " + sub_dir)
+
+		for file in range(0, num_test):
+			stamp = '_' + timestmp(ts).strftime("%d%b%Y_%Hh%Mm%Ss")
+			filename = sub_dir +'/'+ title + stamp
+			system("touch " + filename)
+
+			# remove any number after -m, replace with multiplier for this test
+			_test = T[title].split("-m")
+			_test = _test[0] + "-m " + str(m) + ' -d' + _test[1].split('-d')[1]
+
+			system(_test + " > " + filename)
+
+			print("Stored multi test " + str(file) + " of " + str(num_test))
+			if file == 0:
+				t_elapsed = time() - ts
+				print("duration of test " + str(t_elapsed))
+				t_remain = t_elapsed * num_test * ((max_multi - 1) / step_multi)
+				t_remain = round(t_remain/60, 1)
+				print("Estimated time remaining " + str(t_remain) + " minutes")
+		print("Completed m = " + str(m) + ", in time " + str((time() - ts)/60) + "min")
+	print("All multi tests complete in " + str((time() - ts)/60) )
+		
+	
+
 if __name__ == "__main__":
-	link("http_simple")
+	#link("http_simple")
+	get_multiplier_data_pts("sfr_delay_10_1g")
+
