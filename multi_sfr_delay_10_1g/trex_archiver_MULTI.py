@@ -3,7 +3,7 @@ from os import listdir
 
 def read_file(test_file, out_json, test_type):
   in_arr = []
-  with open(test_file, "rb") as f:
+  with open(test_file, "r") as f:
     in_arr = f.read().split("\n")
 
   divide = 0
@@ -86,12 +86,12 @@ def collect_archive(archive):
   
 
   for dir in listdir('./'):
-    if dir.find('.') == -1 and dir != "initial_testing":
+    if dir.find('.') == -1 and dir != "__pycache__":
       for file in listdir('./' + dir):
 
         print("Reading output from testtype "+ dir +" file "+ file)
 
-	json[dir] = {} #### ADDED for multi
+        json[dir] = {} #### ADDED for multi
         read_file(dir +'/'+ file, json, dir)
 
 
@@ -120,7 +120,7 @@ def collect_archive(archive):
     print("Archiving test " + tag)
 
     # Store read test entries in arrays
-    temp = {"Total-tx-bytes (MB)":[]}
+    temp = {"Total-tx-bytes (GB)":[]}
 
     for title in simple_stats:
       if title not in ["ports", "Total-tx-bytes"]:
@@ -155,8 +155,12 @@ def collect_archive(archive):
               elif metric != "Total-tx-bytes":
                 num = float(num)
               else:
-                num = float(num) * 0.000001 # convert bytes to MB
-                temp["Total-tx-bytes (MB)"].append( num)
+                # convert bytes to GB
+                #num = float(num) * 0.000001
+                num = float(num) / 1024 # B to KB
+                num /= 1024 # KB to MB
+                num /= 1024 # MB to GB
+                temp["Total-tx-bytes (GB)"].append( num)
                 continue
 
               temp[encode[metric]].append(num)
