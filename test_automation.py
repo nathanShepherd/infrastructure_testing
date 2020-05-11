@@ -5,7 +5,7 @@ import datetime
 timestmp = datetime.datetime.fromtimestamp
 no_bundle = "sfr_delay_10_1g_no_bundeling"
 _exe = "./t-rex-64 "
-OUT = "/opt/trex/v2.59/test_dir/"
+OUT = "/opt/trex/v2.57/test_dir/"
 
 # TODO:	Define dictionary T in separate yaml file
 
@@ -48,21 +48,23 @@ def get_multiplier_data_pts(title):
 	out = OUT + dir_name
 	system("mkdir " + out)
 
-        max_multi = 100
+        max_multi = 200
 	step_multi = 10
 	num_test = 3
 	ts = time()
 
 	for m in range(1, max_multi, step_multi):
-		ts = time()
 		sub_dir = out +'/'+ 'm' + str(m)
 		
 		system("mkdir " + sub_dir)
 
 		for file in range(0, num_test):
-			stamp = '_' + timestmp(ts).strftime("%d%b%Y_%Hh%Mm%Ss")
+                        test_start = time()
+			stamp = '_' + timestmp(test_start).strftime("%d%b%Y_%Hh%Mm%Ss")
 			filename = sub_dir +'/'+ title + stamp
 			system("touch " + filename)
+			
+			print(filename)
 
 			# remove any number after -m, replace with multiplier for this test
 			_test = T[title].split("-m")
@@ -76,7 +78,8 @@ def get_multiplier_data_pts(title):
 				print("duration of test " + str(t_elapsed))
 				t_remain = t_elapsed * num_test * ((max_multi - 1) / step_multi)
 				t_remain = round(t_remain/60, 1)
-				print("Estimated time remaining " + str(t_remain) + " minutes")
+				t_remain = str(t_remain) +" minutes"
+				print("Estimated time remain "+ t_remain)
 		print("Completed m = " + str(m) + ", in time " + str((time() - ts)/60) + "min")
 	print("All multi tests complete in " + str((time() - ts)/60) )
 		
@@ -84,5 +87,5 @@ def get_multiplier_data_pts(title):
 
 if __name__ == "__main__":
 	#link("http_simple")
-	get_multiplier_data_pts("sfr_delay_10_1g")
+	get_multiplier_data_pts("http_simple")
 
