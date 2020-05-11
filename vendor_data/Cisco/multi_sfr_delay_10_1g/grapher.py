@@ -6,8 +6,8 @@ def gen_time_series(shape, limits=(0, 10)):
     y = np.random.uniform(limits[0], limits[1], shape)
     return x, sorted(y)
 
-#plt.style.use('ggplot')
-plt.style.use('fivethirtyeight')
+plt.style.use('ggplot')
+#plt.style.use('fivethirtyeight')
 
 def line_plot(x, y, title, xlabel='x', ylabel='y',
                  grid=False, fill=True):
@@ -36,7 +36,7 @@ def line_plot(x, y, title, xlabel='x', ylabel='y',
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    #plt.tight_layout()
+    plt.tight_layout()
     
 def stack_figures(X, Y, shape=(2, 1)):
     if shape[0] * shape[1] != len(Y):
