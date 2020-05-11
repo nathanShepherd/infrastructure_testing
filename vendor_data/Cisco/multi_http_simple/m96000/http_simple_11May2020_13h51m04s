@@ -1,0 +1,827 @@
+The ports are bound/configured.
+Starting  TRex v2.59 please wait  ... 
+ set driver name net_i40e 
+ driver capability  : TCP_UDP_OFFLOAD  TSO 
+ set dpdk queues mode to DROP_QUE_FILTER 
+ Number of ports found: 2
+zmq publisher at: tcp://*:4500
+ wait 1 sec .
+port : 0 
+------------
+link         :  link : Link Up - speed 10000 Mbps - full-duplex
+promiscuous  : 0 
+port : 1 
+------------
+link         :  link : Link Up - speed 10000 Mbps - full-duplex
+promiscuous  : 0 
+ number of ports         : 2 
+ max cores for 2 ports   : 4 
+ tx queues per port      : 6 
+no client generator pool configured, using default pool
+no server generator pool configured, using default pool
+ -------------------------------
+RX core uses TX queue number 5 on all ports
+ core, c-port, c-queue, s-port, s-queue, lat-queue
+ ------------------------------------------
+ 1        0      0       1       0      0  
+ 2        0      1       1       1    255  
+ 3        0      2       1       2    255  
+ 4        0      3       1       3    255  
+ -------------------------------
+no client generator pool configured, using default pool
+no server generator pool configured, using default pool
+ -- loading cap file avl/delay_10_http_browsing_0.pcap 
+i40e_ethertype_filter_set(): There's no corresponding ethertype filter!
+i40e_ethertype_filter_set(): There's no corresponding ethertype filter!
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |          212913 |          324324 
+     obytes |        21394702 |       440814254 
+   ipackets |          324293 |          212919 
+     ibytes |       440762886 |        21395088 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |       0.00  bps |       0.00  bps 
+
+-Global stats enabled 
+ Cpu Utilization : 0.0  %
+ Platform_factor : 1.0  
+ Total-Tx        :       0.00  bps  
+ Total-Rx        :       0.00  bps  
+ Total-PPS       :       0.00  pps  
+ Total-CPS       :       0.00  cps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35168  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :    37857  Servers :    65532   Socket :    35168 Socket/Clients :  139.6 
+ Total_queue_full : 1154719         
+ drop-rate       :       0.00  bps   
+ current time    : 1.8 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.0 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |      510,     510,         0,    0,          5  ,       0,       1      |  0  0  0  0  0  0  0  0  0  0  0  0  0 
+ 1 |      510,     510,         0,    0,          4  ,       0,       0      |  0  0  0  0  0  0  0  0  0  0  0  0  0 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |          475461 |          755353 
+     obytes |        42747511 |      1066673116 
+   ipackets |          755330 |          475532 
+     ibytes |      1066629530 |        42753027 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |       0.00  bps |       0.00  bps 
+
+-Global stats enabled 
+ Cpu Utilization : 20.2  %  0.0 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       0.00  bps  
+ Total-Rx        :       0.00  bps  
+ Total-PPS       :       0.00  pps  
+ Total-CPS       :       0.00  cps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35163  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :    56572  Servers :    65532   Socket :    35164 Socket/Clients :  139.5 
+ Total_queue_full : 2959632         
+ drop-rate       :       0.00  bps   
+ current time    : 2.3 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.0 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     1019,    1019,         0,    0,          8  ,      15,       1      |  0  0  0  0  0  0  0  0  0  0  0  0  0 
+ 1 |     1019,    1019,         0,    0,          6  ,      10,       0      |  0  0  0  0  0  0  0  0  0  0  0  0  0 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |          738028 |         1186294 
+     obytes |        64100600 |      1692402858 
+   ipackets |         1186270 |          738100 
+     ibytes |      1692357728 |        64106628 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     167.47 Mbps |       4.91 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 20.2  %  12.6 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       5.08 Gbps  
+ Total-Rx        :       5.08 Gbps  
+ Total-PPS       :     679.94 Kpps  
+ Total-CPS       :      18.35 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35168  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :    75289  Servers :    65532   Socket :    35168 Socket/Clients :  139.6 
+ Total_queue_full : 4762675         
+ drop-rate       :       0.00  bps   
+ current time    : 2.8 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.0 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     1528,    1528,         0,    0,         10  ,      16,       1      |  0  0  0  0  0  0  0  0  0  0  0  0  15 
+ 1 |     1528,    1528,         0,    0,          7  ,      10,       0      |  0  0  0  0  0  0  0  0  0  0  0  0  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         1000526 |         1617255 
+     obytes |        85449440 |      2318165868 
+   ipackets |         1617238 |         1000550 
+     ibytes |      2318122666 |        85451219 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     167.47 Mbps |       4.91 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 40.0  %  6.4 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       5.08 Gbps  
+ Total-Rx        :       5.08 Gbps  
+ Total-PPS       :     679.94 Kpps  
+ Total-CPS       :      18.35 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35165  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :    94003  Servers :    65532   Socket :    35165 Socket/Clients :  139.5 
+ Total_queue_full : 6565595         
+ drop-rate       :       0.00  bps   
+ current time    : 3.3 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.0 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     2037,    2037,         0,    0,         11  ,      16,       1      |  0  0  0  0  0  0  0  0  0  0  0  15  16 
+ 1 |     2037,    2037,         0,    0,          8  ,      10,       0      |  0  0  0  0  0  0  0  0  0  0  0  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         1263031 |         2048202 
+     obytes |       106798280 |      2943907574 
+   ipackets |         2048188 |         1263049 
+     ibytes |      2943863084 |       106799432 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     252.84 Mbps |       7.41 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 40.0  %  9.6 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       7.66 Gbps  
+ Total-Rx        :       7.66 Gbps  
+ Total-PPS       :       1.03 Mpps  
+ Total-CPS       :      27.70 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35168  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   112720  Servers :    65532   Socket :    35168 Socket/Clients :  139.6 
+ Total_queue_full : 8367998         
+ drop-rate       :       0.00  bps   
+ current time    : 3.8 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.0 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     2546,    2546,         0,    0,         12  ,      16,       1      |  0  0  0  0  0  0  0  0  0  0  15  16  15 
+ 1 |     2546,    2546,         0,    0,          8  ,      10,       0      |  0  0  0  0  0  0  0  0  0  0  10  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         1525539 |         2479159 
+     obytes |       128147798 |      3569660150 
+   ipackets |         2479150 |         1525580 
+     ibytes |      3569617498 |       128150665 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     252.84 Mbps |       7.41 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 54.8  %  7.0 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       7.66 Gbps  
+ Total-Rx        :       7.66 Gbps  
+ Total-PPS       :       1.03 Mpps  
+ Total-CPS       :      27.70 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35168  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   131432  Servers :    65532   Socket :    35168 Socket/Clients :  139.6 
+ Total_queue_full : 10171106         
+ drop-rate       :       0.00  bps   
+ current time    : 4.4 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     3055,    3055,         0,    0,         12  ,      16,       1      |  0  0  0  0  0  0  0  0  0  15  16  15  15 
+ 1 |     3055,    3055,         0,    0,          8  ,      10,       0      |  0  0  0  0  0  0  0  0  0  10  10  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         1788086 |         2910121 
+     obytes |       149499326 |      4195427572 
+   ipackets |         2910117 |         1788160 
+     ibytes |      4195383658 |       149505034 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     293.87 Mbps |       8.61 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 54.8  %  8.1 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       8.91 Gbps  
+ Total-Rx        :       8.91 Gbps  
+ Total-PPS       :       1.19 Mpps  
+ Total-CPS       :      32.20 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35167  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   150150  Servers :    65532   Socket :    35167 Socket/Clients :  139.6 
+ Total_queue_full : 11973561         
+ drop-rate       :       0.00  bps   
+ current time    : 4.9 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     3564,    3564,         0,    0,         12  ,      16,       1      |  0  0  0  0  0  0  0  0  15  16  15  15  16 
+ 1 |     3564,    3564,         0,    0,          8  ,      10,       0      |  0  0  0  0  0  0  0  0  10  10  10  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         2050580 |         3341096 
+     obytes |       170847219 |      4821204500 
+   ipackets |         3341091 |         2050702 
+     ibytes |      4821160586 |       170857214 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     293.87 Mbps |       8.61 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 65.9  %  6.8 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       8.91 Gbps  
+ Total-Rx        :       8.91 Gbps  
+ Total-PPS       :       1.19 Mpps  
+ Total-CPS       :      32.20 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35168  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   168864  Servers :    65532   Socket :    35168 Socket/Clients :  139.6 
+ Total_queue_full : 13775452         
+ drop-rate       :       0.00  bps   
+ current time    : 5.4 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     4073,    4073,         0,    0,         12  ,      16,       1      |  0  0  0  0  0  0  0  15  16  15  15  16  16 
+ 1 |     4073,    4073,         0,    0,          8  ,      10,       0      |  0  0  0  0  0  0  0  10  10  10  10  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         2313098 |         3772029 
+     obytes |       192196123 |      5446927836 
+   ipackets |         3772024 |         2313220 
+     ibytes |      5446883974 |       192206400 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     316.03 Mbps |       9.26 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 65.9  %  7.3 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       9.58 Gbps  
+ Total-Rx        :       9.58 Gbps  
+ Total-PPS       :       1.28 Mpps  
+ Total-CPS       :      34.63 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35164  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   187576  Servers :    65532   Socket :    35164 Socket/Clients :  139.5 
+ Total_queue_full : 15578325         
+ drop-rate       :       0.00  bps   
+ current time    : 5.9 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     4582,    4582,         0,    0,         11  ,      16,       1      |  0  0  0  0  0  0  15  16  15  15  16  16  16 
+ 1 |     4582,    4582,         0,    0,          8  ,      14,       0      |  0  0  0  0  0  0  10  10  10  10  10  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         2575563 |         4202927 
+     obytes |       213542442 |      6072598198 
+   ipackets |         4202924 |         2575598 
+     ibytes |      6072554284 |       213544298 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     316.03 Mbps |       9.26 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 74.3  %  6.4 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       9.58 Gbps  
+ Total-Rx        :       9.58 Gbps  
+ Total-PPS       :       1.28 Mpps  
+ Total-CPS       :      34.63 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35164  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   206289  Servers :    65532   Socket :    35164 Socket/Clients :  139.5 
+ Total_queue_full : 17379712         
+ drop-rate       :       0.00  bps   
+ current time    : 6.4 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     5091,    5091,         0,    0,         12  ,      16,       1      |  0  0  0  0  0  15  16  15  15  16  16  16  16 
+ 1 |     5091,    5091,         0,    0,          8  ,      14,       0      |  0  0  0  0  0  10  10  10  10  10  10  10  14 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         2838068 |         4633890 
+     obytes |       234892254 |      6698361194 
+   ipackets |         4633890 |         2838164 
+     ibytes |      6698319182 |       234898884 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     325.45 Mbps |       9.54 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 74.3  %  6.6 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       9.86 Gbps  
+ Total-Rx        :       9.86 Gbps  
+ Total-PPS       :       1.32 Mpps  
+ Total-CPS       :      35.66 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35160  Clients :      252   Socket-util : 0.2215 %    
+ Open-flows      :   225004  Servers :    65532   Socket :    35160 Socket/Clients :  139.5 
+ Total_queue_full : 19182038         
+ drop-rate       :       0.00  bps   
+ current time    : 6.9 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     5600,    5600,         0,    0,         12  ,      17,       1      |  0  0  0  0  15  16  15  15  16  16  16  16  16 
+ 1 |     5600,    5600,         0,    0,          8  ,      14,       0      |  0  0  0  0  10  10  10  10  10  10  10  14  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         3100615 |         5064838 
+     obytes |       256244511 |      7324100262 
+   ipackets |         5064840 |         3100682 
+     ibytes |      7324056732 |       256249528 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     325.45 Mbps |       9.54 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 80.4  %  6.1 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       9.86 Gbps  
+ Total-Rx        :       9.86 Gbps  
+ Total-PPS       :       1.32 Mpps  
+ Total-CPS       :      35.66 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35168  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   243722  Servers :    65532   Socket :    35168 Socket/Clients :  139.6 
+ Total_queue_full : 20984417         
+ drop-rate       :       0.00  bps   
+ current time    : 7.4 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     6109,    6109,         0,    0,         12  ,      17,       1      |  0  0  0  15  16  15  15  16  16  16  16  16  17 
+ 1 |     6109,    6109,         0,    0,          8  ,      14,       0      |  0  0  0  10  10  10  10  10  10  10  14  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         3363126 |         5495809 
+     obytes |       277593492 |      7949878336 
+   ipackets |         5495814 |         3363225 
+     ibytes |      7949835114 |       277600800 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     331.84 Mbps |       9.73 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 80.4  %  6.3 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :      10.06 Gbps  
+ Total-Rx        :      10.06 Gbps  
+ Total-PPS       :       1.35 Mpps  
+ Total-CPS       :      36.36 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    35165  Clients :      252   Socket-util : 0.2216 %    
+ Open-flows      :   262435  Servers :    65532   Socket :    35165 Socket/Clients :  139.5 
+ Total_queue_full : 22786864         
+ drop-rate       :       0.00  bps   
+ current time    : 7.9 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     6618,    6618,         0,    0,         12  ,      17,       1      |  0  0  15  16  15  15  16  16  16  16  16  17  16 
+ 1 |     6618,    6618,         0,    0,          8  ,      14,       0      |  0  0  10  10  10  10  10  10  10  14  10  10  10 
+[2J[2H
+-Per port stats table 
+      ports |               0 |               1 
+ -----------------------------------------------------------------------------------------
+   opackets |         3597703 |         5915766 
+     obytes |       295025774 |      8575813594 
+   ipackets |         5915774 |         3597772 
+     ibytes |      8575772044 |       295030190 
+    ierrors |               0 |               0 
+    oerrors |               0 |               0 
+      Tx Bw |     331.84 Mbps |       9.73 Gbps 
+
+-Global stats enabled 
+ Cpu Utilization : 85.2  %  5.9 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :      10.06 Gbps  
+ Total-Rx        :      10.06 Gbps  
+ Total-PPS       :       1.35 Mpps  
+ Total-CPS       :      36.36 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :    19801  Clients :      252   Socket-util : 0.1248 %    
+ Open-flows      :   266496  Servers :    65532   Socket :    19801 Socket/Clients :  78.6 
+ Total_queue_full : 24601964         
+ drop-rate       :       0.00  bps   
+ current time    : 8.4 sec  
+ test duration   : 0.0 sec  
+
+-Latency stats enabled 
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     7127,    7127,         0,    0,         12  ,      17,       1      |  0  15  16  15  15  16  16  16  16  16  17  16  15 
+ 1 |     7127,    7127,         0,    0,          8  ,      14,       0      |  0  10  10  10  10  10  10  10  14  10  10  10  11 
+ *** TRex is shutting down - cause: 'test has ended'
+ latency daemon has stopped
+ All cores stopped !! 
+ ==================
+ interface sum 
+ ==================
+ --------------- 
+port : 0 
+------------
+ opackets                                 : 3738469 
+ obytes                                   : 304035594 
+ ipackets                                 : 6136984 
+ ibytes                                   : 8910527178 
+ Tx :     202.27 Mbps  
+port : 1 
+------------
+ opackets                                 : 6136933 
+ obytes                                   : 8910523914 
+ ipackets                                 : 3738520 
+ ibytes                                   : 304038858 
+ Tx :       6.18 Gbps  
+ Cpu Utilization : 85.2  %  3.7 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       6.39 Gbps  
+ Total-Rx        :       6.39 Gbps  
+ Total-PPS       :     848.31 Kpps  
+ Total-CPS       :      18.88 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :        0  Clients :      252   Socket-util : 0.0000 %    
+ Open-flows      :   266496  Servers :    65532   Socket :        0 Socket/Clients :  0.0 
+ Total_queue_full : 25515732         
+ drop-rate       :       0.00  bps   
+ ==================
+ 
+
+ ==================
+ interface sum 
+ ==================
+------------------------ 
+ per core stats core id : 1  
+------------------------ 
+ m_tx_queue_full                          : 6386232 
+------------------------ 
+ per core per if stats id : 1  
+------------------------ 
+ port 0, queue id :0  - client 
+ ---------------------------- 
+ port 1, queue id :0  - server 
+ ---------------------------- 
+ m_tx_queue_full                          : 6386232 
+------------------------ 
+ per core stats core id : 2  
+------------------------ 
+ m_tx_queue_full                          : 6398940 
+------------------------ 
+ per core per if stats id : 2  
+------------------------ 
+ port 0, queue id :1  - client 
+ ---------------------------- 
+ port 1, queue id :1  - server 
+ ---------------------------- 
+ m_tx_queue_full                          : 6398940 
+------------------------ 
+ per core stats core id : 3  
+------------------------ 
+ m_tx_queue_full                          : 6387824 
+------------------------ 
+ per core per if stats id : 3  
+------------------------ 
+ port 0, queue id :2  - client 
+ ---------------------------- 
+ port 1, queue id :2  - server 
+ ---------------------------- 
+ m_tx_queue_full                          : 6387824 
+------------------------ 
+ per core stats core id : 4  
+------------------------ 
+ m_tx_queue_full                          : 6342736 
+------------------------ 
+ per core per if stats id : 4  
+------------------------ 
+ port 0, queue id :3  - client 
+ ---------------------------- 
+ port 1, queue id :3  - server 
+ ---------------------------- 
+ m_tx_queue_full                          : 6342736 
+ ==================
+ generators 
+ ==================
+
+
+normal
+-------------
+ min_delta  : 10 usec 
+ cnt        : 0 
+ high_cnt   : 0 
+ max_d_time : 0 usec
+ sliding_average    : 0 usec
+ precent    : -nan %
+ histogram 
+ -----------
+ m_total_bytes                           :       2.15 Gbytes 
+ m_total_pkt                             :       2.47 Mpkt 
+ m_total_open_flows                      :      66.62 Kflows 
+ m_total_pkt                             : 2465088 
+ m_total_open_flows                      : 66624 
+ m_total_close_flows                     : 66624 
+ m_total_bytes                           : 2303391552 
+
+
+normal
+-------------
+ min_delta  : 10 usec 
+ cnt        : 0 
+ high_cnt   : 0 
+ max_d_time : 0 usec
+ sliding_average    : 0 usec
+ precent    : -nan %
+ histogram 
+ -----------
+ m_total_bytes                           :       2.15 Gbytes 
+ m_total_pkt                             :       2.47 Mpkt 
+ m_total_open_flows                      :      66.62 Kflows 
+ m_total_pkt                             : 2465088 
+ m_total_open_flows                      : 66624 
+ m_total_close_flows                     : 66624 
+ m_total_bytes                           : 2303391552 
+
+
+normal
+-------------
+ min_delta  : 10 usec 
+ cnt        : 0 
+ high_cnt   : 0 
+ max_d_time : 0 usec
+ sliding_average    : 0 usec
+ precent    : -nan %
+ histogram 
+ -----------
+ m_total_bytes                           :       2.15 Gbytes 
+ m_total_pkt                             :       2.47 Mpkt 
+ m_total_open_flows                      :      66.62 Kflows 
+ m_total_pkt                             : 2465088 
+ m_total_open_flows                      : 66624 
+ m_total_close_flows                     : 66624 
+ m_total_bytes                           : 2303391552 
+
+
+normal
+-------------
+ min_delta  : 10 usec 
+ cnt        : 0 
+ high_cnt   : 0 
+ max_d_time : 0 usec
+ sliding_average    : 0 usec
+ precent    : -nan %
+ histogram 
+ -----------
+ m_total_bytes                           :       2.15 Gbytes 
+ m_total_pkt                             :       2.47 Mpkt 
+ m_total_open_flows                      :      66.62 Kflows 
+ m_total_pkt                             : 2465088 
+ m_total_open_flows                      : 66624 
+ m_total_close_flows                     : 66624 
+ m_total_bytes                           : 2303391552 
+ ==================
+ latency 
+ ==================
+ Cpu Utilization : 0.1 %  
+ if|   tx_ok , rx_ok  , rx check ,error,       latency (usec) ,    Jitter          max window 
+   |         ,        ,          ,     ,   average   ,   max  ,    (usec)                     
+ ---------------------------------------------------------------------------------------------------------------- 
+ 0 |     7525,    7525,         0,    0,         12  ,      17,       0      |  0  15  16  15  15  16  16  16  16  16  17  16  15 
+ 1 |     7525,    7525,         0,    0,          8  ,      14,       0      |  0  10  10  10  10  10  10  10  14  10  10  10  11 
+ cpu : 0.1  % 
+ port   0 
+ -----------------
+ counter  
+ -----------
+ m_tx_pkt_ok                              : 7525 
+ m_pkt_ok                                 : 7525 
+ -----------
+ min_delta  : 10 usec 
+ cnt        : 509 
+ high_cnt   : 509 
+ max_d_time : 17 usec
+ sliding_average    : 12 usec
+ precent    : 100.0 %
+ histogram 
+ -----------
+ h[10]  :  7244 
+ jitter                                   : 0 
+ port   1 
+ -----------------
+ counter  
+ -----------
+ m_tx_pkt_ok                              : 7525 
+ m_pkt_ok                                 : 7525 
+ -----------
+ min_delta  : 10 usec 
+ cnt        : 509 
+ high_cnt   : 11 
+ max_d_time : 14 usec
+ sliding_average    : 8 usec
+ precent    : 2.2 %
+ histogram 
+ -----------
+ h[10]  :  145 
+ jitter                                   : 0 
+ rx_checker is disabled  
+ --------------- 
+port : 0 
+------------
+ opackets                                 : 3738469 
+ obytes                                   : 304035594 
+ ipackets                                 : 6136984 
+ ibytes                                   : 8910527178 
+ Tx :     202.27 Mbps  
+port : 1 
+------------
+ opackets                                 : 6136933 
+ obytes                                   : 8910523914 
+ ipackets                                 : 3738520 
+ ibytes                                   : 304038858 
+ Tx :       6.18 Gbps  
+ Cpu Utilization : 85.2  %  3.7 Gb/core 
+ Platform_factor : 1.0  
+ Total-Tx        :       6.39 Gbps  
+ Total-Rx        :       6.39 Gbps  
+ Total-PPS       :     848.31 Kpps  
+ Total-CPS       :      18.88 Kcps  
+
+ Expected-PPS    :       9.86 Mpps  
+ Expected-CPS    :     266.50 Kcps  
+ Expected-BPS    :      73.71 Gbps  
+
+ Active-flows    :        0  Clients :      252   Socket-util : 0.0000 %    
+ Open-flows      :   266496  Servers :    65532   Socket :        0 Socket/Clients :  0.0 
+ Total_queue_full : 25515732         
+ drop-rate       :       0.00  bps   
+ summary stats 
+ -------------- 
+ Total-pkt-drop       : 0 pkts 
+ Total-tx-bytes       : 9214559508 bytes 
+ Total-tx-sw-bytes    : 993300 bytes 
+ Total-rx-bytes       : 9214566036 byte 
+ 
+ Total-tx-pkt         : 9875402 pkts 
+ Total-rx-pkt         : 9875504 pkts 
+ Total-sw-tx-pkt      : 15050 pkts 
+ Total-sw-err         : 25515732 pkts 
+ Total ARP sent       : 0 pkts 
+ Total ARP received   : 6 pkts 
+ maximum-latency   : 17 usec 
+ average-latency   : 12 usec 
+ latency-any-error : OK  
