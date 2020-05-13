@@ -1,22 +1,14 @@
 
 from os import listdir
+import json
 
-def read_file(test_file, out_json, test_type):
-  in_arr = []
-  with open(test_file, "rb") as f:
-    in_arr = f.read().split("\n")
 
-  divide = 0
-  for i in range(len(in_arr) - 1, 0, -1):
-    if in_arr[i] == "port : 0 ":
-      divide = i
-      break
+def find_file_stats_idx(arr):
+  for i in range(len(arr) - 1, 0, -1):
+    if arr[i] == "port : 0 ":
+      return i
 
-  in_arr = in_arr[divide:-2]
-
-  #print(in_arr)
-
-  
+def digest_file_stats(in_arr):
   token = ""
   json = {"port : 0 ": 	{'opackets':"",'obytes':"","ipackets":"","ibytes":"","Tx":""},
           "port : 1 ": 	{'opackets':"",'obytes':"","ipackets":"","ibytes":"","Tx":""},
@@ -67,31 +59,43 @@ def read_file(test_file, out_json, test_type):
           
       except IndexError as e:
         print(e)
-    
+        
+  return json
+
+#%%%%%%%%%%%%%%%%%%%%%%%%#
+
+def read_file(test_file, out_json, test_type):
+  # Read output from a TRex output .txt
+  #   convert to json object (dict)  
+  in_arr = []
+  with open(test_file, "r") as f:
+    in_arr = f.read().split("\n")
+
+  # Find End of Test stats, remove data appearing before
+  divide = find_file_stats_idx(in_arr)
+  in_arr = in_arr[divide:-2]
+
+  # Format stats into a known dictionary
+  json = digest_file_stats(in_arr)
   out_json[test_type][test_file] = json
   
 
-#%%%%%%%%%%%%%%%%%%%%%%%%
-# Populate archive from keys in json and directories in ./
+#%%%%%%%%%%%%%%%%%%%%%%%%#
 
 def collect_archive(archive):
-  '''
-  json = {"pS_thruput":{},
-          "http_simple":{},
-          "imix_64_100k":{},
-    	  "sfr_delay_10_1g":{},
-	  "sfr_delay_10_1g_no_bundeling":{}}
-  '''
+  # Format test data to keys in json and directories in ./
   json = {}
   
 
   for dir in listdir('./'):
-    if dir.find('.') == -1 and dir != "initial_testing":
+    if dir.find('.') == -1 and dir != "__pycache__":
+      json[dir] = {} #### ADDED for multi
+      
       for file in listdir('./' + dir):
 
         print("Reading output from testtype "+ dir +" file "+ file)
 
-	json[dir] = {} #### ADDED for multi
+        
         read_file(dir +'/'+ file, json, dir)
 
 
@@ -100,15 +104,8 @@ def collect_archive(archive):
                   "average-latency":[], "maximum-latency":[],
                   "Total-pkt-drop":[], "Total-tx-bytes":[],
                   "Total-Tx":[],"CpuUtilization":[]}
-  '''
-  tags = ["sfr_delay_10_1g_no_bundeling",
-         "sfr_delay_10_1g",
-         "imix_64_100k" ,
-         "http_simple",
-         "pS_thruput",]
-  '''
   
-  encode = {"Total-Tx":"Total-Tx (Mbps)",
+  encode = {"Total-Tx":"Total-Tx (Gbps)",
             "maximum-latency":"maximum-latency (usec)",
             "Total-pkt-drop":"Total-pkt-drop (pkts)",
             "Total-tx-bytes":"Total-tx-bytes (bytes)",
@@ -116,11 +113,13 @@ def collect_archive(archive):
             "CpuUtilization":"CpuUtilization"}# CPU has 2 units
 
   #for tag in tags: 
-  for tag in json.keys(): ##### added for multi
-    print("Archiving test " + tag)
+  for dir_name in json.keys(): ##### added for multi
+    if dir_name == 'm1':
+      continue
+    print("Archiving test " + dir_name)
 
     # Store read test entries in arrays
-    temp = {"Total-tx-bytes (MB)":[]}
+    temp = {"Total-tx-bytes (GB)":[]}
 
     for title in simple_stats:
       if title not in ["ports", "Total-tx-bytes"]:
@@ -129,40 +128,73 @@ def collect_archive(archive):
         temp["ports"] = simple_stats["ports"]
     
     # Reading statistics from filesystem
-    for file in json[tag]:
-      for stat in json[tag][file]:
+    for file in json[dir_name]:
+      for stat in json[dir_name][file]:
         if stat == "port : 0 ":
           for top in simple_stats["ports"]["0"]:
-            temp["ports"]["0"][top].append(json[tag][file]["port : 0 "][top])
+            temp["ports"]["0"][top].append(json[dir_name][file]["port : 0 "][top])
         elif stat == "port : 1 ":
           for top in simple_stats["ports"]["1"]:
-            temp["ports"]["1"][top].append(json[tag][file]["port : 1 "][top])
-        else:
-          for metric in json[tag][file][stat]:
+            temp["ports"]["1"][top].append(json[dir_name][file]["port : 1 "][top])
+
+        else: # Extract non-port level data
+          #print(dir_name, file, stat)
+          #---> m1000 m1000/http_simple_11May  'summary stats'
+          #print(json[dir_name][file][stat]); quit()
+          for metric in json[dir_name][file][stat]:
             if metric in simple_stats:
               # Remove units from test statistics
 
-              entry = json[tag][file][stat][metric]
+              entry = json[dir_name][file][stat][metric]
               if metric == encode[metric] or entry == "":
                 temp[encode[metric]].append(entry)
                 continue
 
+              # Attemp to get units from assumed encoding
               units = encode[metric].split('(')[-1][:-1]
+              
+              # TODO: get units from entry and do conversion #####################
+
+              # If units not in assumed format, convert to Gbps
+              if entry.find(units) == -1:
+                units = entry[-4:]
+                num = float(entry[:-4])
+                
+                if entry[-4:] == 'Kbps':
+                  num = (num / 1024) / 1024
+                  temp[encode[metric]].append(num)
+                  continue
+                elif entry[-4:] == 'Mbps':
+                  num = num / 1024
+                  temp[encode[metric]].append(num)
+                  continue
+                elif entry[-4:] == 'Gbps':
+                  temp[encode[metric]].append(num)
+                  continue
+                else:
+                  raise TypeError('cannot cast ' + str(entry) +' to num')
+                
               num = entry.split(units)[0]
 
               if metric == "Total-pkt-drop": 
                 num = int(num) 
               elif metric != "Total-tx-bytes":
+                #print(metric) ### ERROR
                 num = float(num)
               else:
-                num = float(num) * 0.000001 # convert bytes to MB
-                temp["Total-tx-bytes (MB)"].append( num)
+                # convert bytes to GB
+                num = float(num) / 1024 # B to KB
+                num /= 1024 # KB to MB
+                num /= 1024 # MB to GB
+                temp["Total-tx-bytes (GB)"].append( num)
                 continue
 
               temp[encode[metric]].append(num)
 
-    archive[tag] = temp
+    #print(temp); break
+    archive[dir_name] = temp
 
 if __name__ == "__main__":
   archive = {}
   collect_archive(archive)
+  
