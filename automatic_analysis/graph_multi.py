@@ -1,130 +1,205 @@
-from analysis_MULTI import get_data, title_stats
+from analysis import get_data, title_stats
 from grapher import line_plot,  stack_figures
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
+
+
 '''
-  encode = {"Total-Tx":"Total-Tx (Mbps)",
-            "maximum-latency":"maximum-latency (usec)",
-            "Total-pkt-drop":"Total-pkt-drop (pkts)",
-            "Total-tx-bytes":"Total-tx-bytes (bytes)",
-            "average-latency":"average-latency (usec)",
-            "CpuUtilization":"CpuUtilization"}# CPU has 2 units
+TODO
+    Set a range for x&y axes
+    add legend for error bars and data point markers
+
+Optional
+    combine graph of avg_latency and max_latency with filled color
+    
+Done
+    add functional notations
+    update process to access vendor data from root directory
+
+    graph
+        x = cpu_util (%)
+        y = throughput
 '''
 
-def main():
-    data = get_data()
-    stats = title_stats(data)
+def select_from(data, where=""):
+    #return df.filter(like='where', axis=0)
+
+    df = {'multiple':[]}# name of directories
+
+    directories = list(data.keys())
+    example = directories[0]
+    
+    for metric in data[example]:
+            df[metric] = []
+
+    
+    for dir_name in directories:
+        df['multiple'].append( int(dir_name[1:]) )
+                               
+        for metric in data[dir_name]:            
+            df[metric].append(data[dir_name][metric][where])
+                
+        
+    #print(df.head())
+            
+    return pd.DataFrame(df)
+    
+
+def preprocess(data, stats_list, index):
+    ''' Return dictionary of DataFrames representing Data
+
+        data is accessed like:
+            data['m1']['Total-Tx (Mbps)']['mean']
+            
+        Each df:
+            has columns set to stats_list
+            index set to index
+            sorted by index
+    '''
+    
+
+    #df = pd.DataFrame(data)
+    #print(df.columns) # ['m1', 'm5', 'm9', ...]
+
+    dataframe_dict = {}
+    
+    for statistic in stats_list:
+        df = select_from(data, statistic)
+        df = df.set_index(index).sort_index()
+
+        df = df.groupby(index).mean()
+        
+        dataframe_dict[statistic] = df
+       
+    #print(dataframe_dict)
+
+    return dataframe_dict
+
+
+def get_vendor_data(sort_by_idx = 'multiple', start_end=[0, 100]):
+    device_name = "Cisco"
+    test_name = "multi_sfr_delay_10_1g"
+    
+    names = [device_name, test_name]
+   
+    data = get_data(device_name, test_name)
+    stats, stats_list = title_stats(data)
     #stats['m1']['Total-Tx (Mbps)']['mean']
-    #print(stats)
 
-    multiplier = []    # X
-    total_tx = []       # y1
     
-    max_latency = []
-    avg_latency = []
     
-    latency_sigma = [] # for errorbars
-    avg_latency_sigma = []
+    dataframe_dict = preprocess(stats, stats_list, index= sort_by_idx)
+    
+    return dataframe_dict, names, start_end
 
-    throughput = [] #y2
 
-    total_tx = []
-    cpu = []
-    cpu_sigma = []
+def pandas_graph(sort_by_idx='multiple'):
+
+    info = get_vendor_data(sort_by_idx)
     
+    dataframe_dict, names, rng = info
+    device_name, test_name = names
+    start_idx, end_idx = rng
     
-    for m in stats:
-        multiplier.append(     int(m[1:]))
-        if stats[m]['maximum-latency (usec)']['mean'] > 15:
-            max_latency.append( stats[m]['maximum-latency (usec)']['min'])
-        else:
-            max_latency.append( stats[m]['maximum-latency (usec)']['mean'])
-        latency_sigma.append( stats[m]['maximum-latency (usec)']['StdDev'])
+    for stat in dataframe_dict:
+        df = dataframe_dict[stat]
+        df = df[start_idx:end_idx]
         
-        avg_latency.append( stats[m]['average-latency (usec)']['mean'] )
-        avg_latency_sigma.append( stats[m]['average-latency (usec)']['StdDev'] )
+        df.plot()
         
-        total_tx.append(        stats[m]['Total-tx-bytes (GB)']['mean'])        
-        throughput.append(stats[m]['Total-Tx (Gbps)']['mean'])
+        plt.title(device_name + " " + stat)
+        plt.show()
 
-        cpu.append(stats[m]['CpuUtilization (%)']['mean'])
-        cpu_sigma.append(stats[m]['CpuUtilization (%)']['StdDev'])
+        quit()
 
-        
-    '''
-    print(multiplier)
-    print(total_tx)
-    print(max_latency)
-    print(throughput)
-    '''
-    print(cpu)
 
-    z = list(zip(multiplier, throughput,
-                 max_latency, latency_sigma,
-                 avg_latency, avg_latency_sigma,
-                 cpu, cpu_sigma,
-                 total_tx))
-    z.sort(key= lambda x: x[0])
-
-    max_idx = 32
-    start_idx = 15
-    z = np.array(z)
-
+def graph(stat='mean',
+                  sort_by_idx='multiple', # <-- x_axis
+                  y1_label='Throughput (Gbps)',
+                  y2_label='Total-tx-bytes (GB)'):
     
+    info = get_vendor_data(sort_by_idx)
     
-    multiplier =        z[start_idx:max_idx, 0]
-    throughput =     z[start_idx:max_idx, 1]
-    
-    max_latency =   z[start_idx:max_idx, 2]
-    latency_sigma = z[start_idx:max_idx,3]
-    
-    avg_latency =     z[start_idx:max_idx,4]
-    avg_latency_sigma = z[start_idx:max_idx,5]
-    
-    cpu =                  z[start_idx:max_idx,6]
-    cpu_sigma =     z[start_idx:max_idx,7]
+    dataframe_dict, names, rng = info
+    device_name, test_name = names
+    start, end = rng
 
-    total_tx =          z[start_idx:max_idx,8]
-
+    #print(dataframe_dict[stat])
+    print(dataframe_dict[stat][[y1_label, y2_label]])
     
-    X = [multiplier, multiplier]
-    Y = [throughput, total_tx]
-
-    # Bar graph
+    X = dataframe_dict[stat].index[start:end]
+    Y = dataframe_dict[stat][[y1_label, y2_label]].iloc[start:end]
+    print(len(X), Y.shape)
+    
+    # Bar grapht
     width = .4
-    x_idx = np.arange(len(multiplier))
-    plt.bar(x_idx, throughput, width=width,
-            color='orange', label='Throughput (Gbps)')
-    plt.bar(x_idx + width, total_tx, width=width,
-            color='purple', label='Total Transmit (GB)')
-    plt.xticks(ticks=x_idx, label=multiplier)
-    plt.xlabel('Multiplier (10k)')
-    plt.title("Arista Pressure Test, 10sec, 4cpu cores")
+    x_idx = np.arange(len(X))
+    plt.bar(x_idx, Y[y1_label], width=width,
+            color='orange', label=y1_label)
+    plt.bar(x_idx + width, Y[y2_label], width=width,
+            color='purple', label=y2_label)
+    plt.xticks(ticks=x_idx, label=X)
+    plt.xlabel(sort_by_idx)
+    plt.title(device_name + " Pressure Test, 10sec, 4cpu cores")
     plt.legend()
     #plt.show()
 
     fig, axes = plt.subplots(2)
-    fig.suptitle("Arista: http_simple, 10sec, 4cpu cores")
+    fig.suptitle(device_name + ": "+ test_name +", 10sec, 4cpu cores")
     
-    axes[0].plot(X[0], Y[0], color="g")
-    axes[0].set(ylabel='Throughput (Gbps)')
+    
+    axes[0].plot(X, Y[y1_label], color="g")
+    axes[0].set(ylabel=y1_label)
 
-    
-    #axes[1].errorbar(X[1], Y[1], yerr=np.sqrt(cpu_sigma), color='blue', alpha=0.5)
-    axes[1].plot(X[1], Y[1], color='b')
+        
+    y2_sigma = dataframe_dict['StdDev'][y2_label].iloc[start:end]
+    if y2_sigma.shape[0] == len(X):
+        axes[1].errorbar(X, Y[y2_label],
+                                     yerr=np.sqrt( y2_sigma ),
+                                     color='blue', alpha=0.1)
+        
+    axes[1].plot(X, Y[y2_label], color='purple')
     
     #'CpuUtilization (%)'
-    axes[1].set(ylabel='Total Transmitted (GB)', xlabel='Multiple')
+    axes[1].set(ylabel=y2_label, xlabel=sort_by_idx)
     
     
     #stack_figures(X,Y)
     plt.show()
     
-        
+'''  
+Data Metrics Available:
+
+    "Throughput (Gbps)",
+    "maximum-latency (usec)",
+    "Total-pkt-drop (pkts)",
+    "Total-tx-bytes (GB)",
+    "average-latency (usec)",
+    "CpuUtilization (%)" 
+
+Statistics Available for each Data Metric:
+    stats_list = ["mean", "min", 
+                          "max", "StdDev",
+                          "num"]
+
+'''        
     
     
 if __name__ == "__main__":
-    main()
+    # Note: Before using graph()
+    #            Update in get_vendor_data()
+    #            --> vendor_name and test_name
+    
+    pandas_graph()
+    
+    graph(     sort_by_idx=     'multiple',
+                     y1_label=            'Throughput (Gbps)',
+                     y2_label=            "maximum-latency (usec)",
+               )
+    
+    #sort_by_idx="CpuUtilization (%)" )
+    #y2_label='avg-latency (usec)'
+    #

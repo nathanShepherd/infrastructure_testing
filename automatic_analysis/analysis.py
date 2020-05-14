@@ -1,4 +1,4 @@
-from trex_multiple_processor import collect_archive
+from vendor_data_archiver import collect_archive
 from math import sqrt
 
 def viz_simple_stats(simple_stats):
@@ -45,7 +45,9 @@ def sigma(arr, mean):
 	return sqrt(el)
 
 def title_stats(json):
-        outs = {}
+        stats_list =    ["mean", "min", 
+                                "max", "StdDev","num"]
+        outs = {}        
         for title in json:
                 outs[title] = {}
                 for test in json[title]:
@@ -61,7 +63,7 @@ def title_stats(json):
                         outs[title][test]["StdDev"] = sigma(entries, mu)
                         outs[title][test]["num"] = len(entries)
 
-        return outs
+        return outs, stats_list
 			
 def print_gen_stats(archive):
         for title in archive:
@@ -72,19 +74,19 @@ def print_gen_stats(archive):
                                 out = '\t' + stat + "\t" 
                                 print(out + str(archive[title][el][stat]))
                                 
-def get_data():
+def get_data(vendor, test):
         data = {}
-        collect_archive(data)
+        collect_archive(data, vendor, test)
         return clean(data)
 
 def main_print():
-        hive = get_data()
+        hive = get_data('Arista', 'multi_http_simple')
         '''
         for title in hive:
                 print("||| TITLE ||| ::: " + title)
                 viz_simple_stats(hive[title])
         '''      
-        hive_stat = title_stats(hive)
+        hive_stat, _ = title_stats(hive)
         print_gen_stats(hive_stat)
         
 if __name__ == "__main__":
