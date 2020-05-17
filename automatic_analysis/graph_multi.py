@@ -79,9 +79,8 @@ def preprocess(data, stats_list, index):
     return dataframe_dict
 
 
-def get_vendor_data(sort_by_idx = 'multiple', start_end=[0, 100]):
-    device_name = "Cisco"
-    test_name = "multi_sfr_delay_10_1g"
+def get_vendor_data(device_name, test_name,
+                                        sort_by_idx = 'multiple', start_end=[0, 19]):
     
     names = [device_name, test_name]
    
@@ -96,10 +95,8 @@ def get_vendor_data(sort_by_idx = 'multiple', start_end=[0, 100]):
     return dataframe_dict, names, start_end
 
 
-def pandas_graph(sort_by_idx='multiple'):
+def pandas_graph(info):
 
-    info = get_vendor_data(sort_by_idx)
-    
     dataframe_dict, names, rng = info
     device_name, test_name = names
     start_idx, end_idx = rng
@@ -116,23 +113,24 @@ def pandas_graph(sort_by_idx='multiple'):
         quit()
 
 
-def graph(stat='mean',
-                  sort_by_idx='multiple', # <-- x_axis
+def graph(info, stat='mean',
+                  sort_by_idx = 'multiple', # <--sort and group, x-axis
                   y1_label='Throughput (Gbps)',
                   y2_label='Total-tx-bytes (GB)'):
     
-    info = get_vendor_data(sort_by_idx)
     
     dataframe_dict, names, rng = info
     device_name, test_name = names
     start, end = rng
 
     #print(dataframe_dict[stat])
-    print(dataframe_dict[stat][[y1_label, y2_label]])
+    
     
     X = dataframe_dict[stat].index[start:end]
     Y = dataframe_dict[stat][[y1_label, y2_label]].iloc[start:end]
-    print(len(X), Y.shape)
+
+    print(Y.head(), "\n Y Shape: ", Y.shape)
+    #print(len(X), Y.shape)
     
     # Bar grapht
     width = .4
@@ -185,21 +183,30 @@ Statistics Available for each Data Metric:
                           "max", "StdDev",
                           "num"]
 
-'''        
+'''
+
+def main():
     
+    x_axis = 'multiple'
+    val_range = [0, 19]
+    device_name = "Arista"
+    test_name = "multi_http_simple"
     
-if __name__ == "__main__":
-    # Note: Before using graph()
-    #            Update in get_vendor_data()
-    #            --> vendor_name and test_name
+    info = get_vendor_data(device_name, test_name,
+                                               sort_by_idx = x_axis,
+                                               start_end=val_range)
     
-    pandas_graph()
+    #pandas_graph(info)
     
-    graph(     sort_by_idx=     'multiple',
-                     y1_label=            'Throughput (Gbps)',
-                     y2_label=            "maximum-latency (usec)",
-               )
+    graph(info,
+            y1_label=            'Throughput (Gbps)',
+            y2_label=            "maximum-latency (usec)",
+            )
     
     #sort_by_idx="CpuUtilization (%)" )
     #y2_label='avg-latency (usec)'
     #
+    
+if __name__ == "__main__":
+    main()
+

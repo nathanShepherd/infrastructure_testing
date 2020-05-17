@@ -1,6 +1,8 @@
 from vendor_data_archiver import collect_archive
 from math import sqrt
 
+from parse_global_stats import global_tx_stats
+
 def viz_simple_stats(simple_stats):
         for t in simple_stats:
                 print(t)
