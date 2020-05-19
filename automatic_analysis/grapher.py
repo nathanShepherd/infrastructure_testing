@@ -8,6 +8,9 @@ def gen_time_series(shape, limits=(0, 10)):
 
 plt.style.use('ggplot')
 #plt.style.use('fivethirtyeight')
+#plt.style.use('bmh')
+#plt.style.use('seaborn-whitegrid')
+#plt.tight_layout()
 
 def line_plot(x, y, title, xlabel='x', ylabel='y',
                  grid=False, fill=True):
@@ -36,19 +39,25 @@ def line_plot(x, y, title, xlabel='x', ylabel='y',
     plt.title(title)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.tight_layout()
     
-def stack_figures(X, Y, shape=(2, 1)):
+    
+def stack_figures(X, Y, shape=(2, 1), ylabel=['y1', 'y2'], xlabel=['x']):
     if shape[0] * shape[1] != len(Y):
         raise NameError('Length of Y must be num of subplts')
+    fig, ax = plt.subplots(shape[0])
     
     plt_num = 0
     for row in range(1, shape[0] + 1):
-        for col in range(1, shape[1] + 1):
+        #for col in range(1, shape[1] + 1):
+        for axes in ax:
+            axes.plot(X[plt_num], Y[plt_num])
+            '''
             print(row, col, plt_num)
             plt.subplot(shape[0], shape[1], plt_num + 1) # = (nRows, nCols, plt_num)
             plt.plot(X[plt_num], Y[plt_num])
+            '''
             plt_num += 1
+            
 
 def example_bar_plot_offset():
     x_idx = np.arange(10)
@@ -67,14 +76,15 @@ def example_bar_plot_offset():
     
 def main_line_examples():
     x, y = gen_time_series(10)
-    #x2, y2 = gen_time_series(10)
-    #stack_figures([x, x2], [y, y2])
+    x2, y2 = gen_time_series(10)
+    stack_figures([x, x2], [y, y2])
     
-    line_plot(x, y, 'Series', grid=True)
+    #line_plot(x, y, 'Series', grid=True)
     plt.show()
 
 if __name__ == "__main__":
-    example_bar_plot_offset()
+    main_line_examples()
+    #example_bar_plot_offset()
     
     
     

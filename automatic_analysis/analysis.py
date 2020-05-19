@@ -1,5 +1,7 @@
-from trex_archiver import collect_archive
+from vendor_data_archiver import collect_archive
 from math import sqrt
+
+from parse_global_stats import global_tx_stats
 
 def viz_simple_stats(simple_stats):
         for t in simple_stats:
@@ -22,7 +24,15 @@ def clean(archive):
         for title in archive:
                 temp = {}
                 for test in archive[title]:
-                        if test not in ["CpuUtilization", "ports"]:
+                        if test == "CpuUtilization":
+                                #print(archive[title][test]); quit()
+                                cpu_arr = archive[title][test]
+                                for i in range(len(cpu_arr)):
+                                        cpu_arr[i] = float(cpu_arr[i].split('%')[0])
+                                        
+                                temp[test + " (%)"] = cpu_arr
+                                
+                        elif test != "ports":
                                 temp[test] = archive[title][test]
                                 outs[title] = temp
         return outs
@@ -37,7 +47,9 @@ def sigma(arr, mean):
 	return sqrt(el)
 
 def title_stats(json):
-        outs = {}
+        stats_list =    ["mean", "min", 
+                                "max", "StdDev","num"]
+        outs = {}        
         for title in json:
                 outs[title] = {}
                 for test in json[title]:
@@ -47,11 +59,13 @@ def title_stats(json):
                                 continue
 
                         mu = mean(entries)
-                        outs[title][test]["mean"] = mu 
+                        outs[title][test]["mean"] = mu
+                        outs[title][test]["min"] = min(entries)
+                        outs[title][test]["max"] = max(entries)
                         outs[title][test]["StdDev"] = sigma(entries, mu)
                         outs[title][test]["num"] = len(entries)
 
-        return outs
+        return outs, stats_list
 			
 def print_gen_stats(archive):
         for title in archive:
@@ -61,17 +75,21 @@ def print_gen_stats(archive):
                         for stat in archive[title][el]:
                                 out = '\t' + stat + "\t" 
                                 print(out + str(archive[title][el][stat]))
-				
+                                
+def get_data(vendor, test):
+        data = {}
+        collect_archive(data, vendor, test)
+        return clean(data)
 
-if __name__ == "__main__":
-        hive = {}
-        collect_archive(hive)
-        hive = clean(hive)
-
+def main_print():
+        hive = get_data('Arista', 'multi_http_simple')
+        '''
         for title in hive:
                 print("||| TITLE ||| ::: " + title)
                 viz_simple_stats(hive[title])
-
-        hive_stat = title_stats(hive)
+        '''      
+        hive_stat, _ = title_stats(hive)
         print_gen_stats(hive_stat)
-
+        
+if __name__ == "__main__":
+        main_print()

@@ -1,2 +1,3 @@
 # infrastructure_testing
-Server deployment and configuration for U of M | Network Infrastructure | ITS
+Software Based Networking | U of M | Network Infrastructure | ITS
+![Test Configuration](/graphs/Test_Configuration.png)
