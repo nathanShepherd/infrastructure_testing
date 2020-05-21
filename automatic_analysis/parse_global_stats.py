@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
+plt.style.use('bmh')
+
 b_to_GB =  ((( 1 / 1024) / 1024) / 1024)
 def bytes_to_GB(num):
     return num * b_to_GB
@@ -97,7 +99,7 @@ def read_file(file_loc):
                 
                 if metric[-3:] in ['-Rx', 'PPS', 'CPS', 'BPS',
                                    'tor', # Platform_factor
-                                   'ion', # test duration, Cpu Utilization
+                                   #'ion', # test duration, Cpu Utilization
                                    'ull']: # total_queue_full
                     #print('XXXX', metric, row)
                     continue
@@ -145,7 +147,7 @@ def global_tx_stats(vendor, test, folder='m11'):
 
     if folder != None:
         read_directory(global_table, data_loc, folder)
-
+        #print(global_table[folder].keys())
         return global_table
     
     for dir in listdir(data_loc):
@@ -161,7 +163,7 @@ def global_tx_stats(vendor, test, folder='m11'):
 
 
 
-def preprocess(stats_table, folder=None):
+def mean_df(stats_table, folder=None):
     ''' Summarize test statitics from a directory of folders
         Each folder contains multiple tests run with the same parameters'''
     
@@ -178,9 +180,9 @@ def preprocess(stats_table, folder=None):
                                              index=stats_table[folder][file]['currenttime'])
             all_files.append(g)
 
-        #print(all_files)
+        #print(all_files[0].columns)
 
-        mean_df = {}
+        mean_df = {} # mean of all files in folder for all tests
         for col in all_files[0].columns:
             
             values = []
@@ -188,11 +190,9 @@ def preprocess(stats_table, folder=None):
                 values.append(file[col].values)
                 
             values = np.array(values)
-            #print(values)
-            #print(values.shape)
 
             mean_df[col] = np.mean(values.T, axis=1)
-            #print(mean_df, mean_df.shape)
+
             
             
         out_df['mean'] = pd.DataFrame(mean_df, index=mean_df['currenttime'])
@@ -209,26 +209,77 @@ def preprocess(stats_table, folder=None):
                 g = pd.DataFrame(stats_table[folder][file],
                                                  index=stats_table[folder][file]['currenttime'])
         '''
+def read_pS_file(global_table, data_loc):
+    in_arr = []
+    with open(data_loc, "r") as f:
+        # Skip initializer info, get full text data
+
+        intro, full_test = f.read().split('* Stream ID 5')
+
+        #print(full_test, '\n %%%%%%%')
+        #print(summary, '\n %%%%%%%')
+        #quit()
+        
+        in_arr = full_test.split("Summary")[0].split('\n')
+        
+    titles, in_arr = in_arr[1], in_arr[2:]
+    stats = {'throughput':[], 'retransmits':[]}
+    
+    for row in in_arr[:-2]: # skip empty newlines
+        row  = row[15:] # removing 'interval'
+        print(row)
+        gb_rate, row = row.split('ps')
+        if gb_rate[-2:] == 'Mb':
+            gb_rate = float(gb_rate[:-2]) /1024
+        else:
+            gb_rate = float(gb_rate[:-2])
+        stats['throughput'].append(gb_rate)
+        stats['retransmits'].append(int(row[4:11]))
+
+    file = data_loc.split('/')[-1]
+    global_table[file] = pd.DataFrame(stats)
+        
+def get_pS_throughput(vendor='Arista', test='pSControl'):
+    data_loc = '../vendor_data/' + vendor +'/' +test +'/'
+    global_table = {}
+
+    for file in listdir(data_loc):
+        read_pS_file(global_table, data_loc + file)
+    return global_table
+                
+def graph_pS(vendor='Arista', test='pSControl'):
+    stats_table = get_pS_throughput(vendor, test)
+    all_files = []
+        
+    for i, file in enumerate(stats_table):
+        g = pd.DataFrame(stats_table[file])
+        all_files.append(g)
+
+        #print(all_files[0].columns)
+
+    mean_df = {} # mean of all files in folder for all tests
+    for col in all_files[0].columns:
+            
+        values = []
+        for file in all_files:
+            values.append(file[col].values)
+                
+        values = np.array(values)
+
+        mean_df[col] = np.mean(values.T, axis=1)
+
+    df = pd.DataFrame(mean_df)
+    df.plot()
+    plt.title(vendor + " " + test)
+    plt.show()
 
 def single_file_stats():
     
-    global_tx_stats('Arista', 'multi_http_simple',
-                                                          folder='m1000000')
+    stats_table = global_tx_stats('Arista', 'control_sfr_delay_10_1g_6cores',
+                                                          folder='m21')
     '''
     file = 'http_simple_11May2020_09h47m16s'
-    
-    table = stats_table[file]
-    
-    for row in table:
-        print(row, len(table[row]), table[row])
-    
-    
-    df = pd.DataFrame(stats_table[file])
-    print(df.head())
-    df.plot()
-    plt.show()
     '''
-
     
     for folder in stats_table:
         for file in stats_table[folder]:
@@ -238,20 +289,54 @@ def single_file_stats():
             g.plot()
             plt.title(file)
             plt.show()
+
+def describe_all(vendor='Arista', test='multi_http_simple'):
+    stats_table = global_tx_stats( vendor, test, folder=None)
+
+    columns = ['TxBw_port_0', 'TxBw_port_1','CpuUtilization','currenttime']
+    '''
+    some possible columns:
+    ['obytes_port_0', 'obytes_port_1', 'ierrors_port_0', 'ierrors_port_1',
+       'TxBw_port_0', 'TxBw_port_1', 'CpuUtilization', 'Total-Tx', 'drop-rate',
+       'currenttime', 'testduration']
+    '''
+    folders_sorted = sorted(list(map(lambda x: int(x[1:]),
+                                                             list(stats_table.keys()))))
+    for folder in folders_sorted:
+        df = mean_df(stats_table, folder='m' + str(folder))
         
-            
-            
     
-if __name__ == "__main__":
-    stats_table = global_tx_stats( 'Arista', 'multi_http_simple',
-                                                          folder=None) #'m101000')
-    df = preprocess(stats_table, folder='m101000')
-    df['mean'].plot()
-    plt.show()
-    '''
+        #print(df['mean'].columns); quit()
+        print(f'\n---> {vendor} {test} {folder}')
+        print(df['mean'][columns].describe().loc[['max', 'mean']])
+            
+def plot_all_folders(vendor='Arista', test='multi_http_simple'):
+    stats_table = global_tx_stats( vendor, test, folder=None)
+
+    columns = ['TxBw_port_0', 'TxBw_port_1', 'drop-rate']
+
     for folder in stats_table:
-        df = preprocess(stats_table, folder=folder)
+        df = mean_df(stats_table, folder=folder)
     
-        df['mean'].plot()
+        df['mean'][columns].plot()
+        
+        plt.title(f'{vendor} {test} {folder}')
         plt.show()
-    '''
+    
+def plot_single_folder(vendor='Arista', test='multi_http_simple', folder='m101000'):
+    stats_table = global_tx_stats(vendor, test, folder=folder) 
+    df = mean_df(stats_table, folder=folder)
+
+    columns = ['TxBw_port_0', 'TxBw_port_1', 'drop-rate']
+    df['mean'][columns].plot()
+    plt.title(f'{vendor} {test} {folder}')
+    plt.show()
+
+if __name__ == "__main__":
+    #plot_all_folders()
+    describe_all(test='multi_sfr_delay_10_1g')# control_http_6cores 
+    #single_file_stats()
+    #plot_single_folder(test='pS_Simult_http_6cores',folder = 'm101000')
+    #plot_single_folder(test='control_sfr_delay_10_1g_6cores',folder = 'm21')
+    #get_pS_throughput()
+    #graph_pS()
