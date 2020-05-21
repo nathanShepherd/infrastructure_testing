@@ -1,11 +1,11 @@
 from analysis import get_data, title_stats
-from grapher import line_plot,  stack_figures
+from parse_global_stats import global_tx_stats, mean_df
 
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-
+plt.style.use('bmh')
 
 '''
 TODO
@@ -74,8 +74,7 @@ def preprocess(data, stats_list, index):
         
         dataframe_dict[statistic] = df
        
-    #print(dataframe_dict)
-
+    
     return dataframe_dict
 
 
@@ -94,6 +93,40 @@ def get_vendor_data(device_name, test_name,
     
     return dataframe_dict, names, start_end
 
+def get_max_test_data(vendor, test):
+    ''' Max test statistic for each division in full TRex Output'''
+    stats_table = global_tx_stats( vendor, test, folder=None)
+
+    #columns = ['TxBw_port_0', 'TxBw_port_1']#,'drop-rate','currenttime']
+    columns = ['obytes_port_0', 'obytes_port_1', 'ierrors_port_0', 'ierrors_port_1',
+       'TxBw_port_0', 'TxBw_port_1', 'CpuUtilization', 'Total-Tx', 'drop-rate',
+       'currenttime', 'testduration',]
+
+    
+    folders_sorted = sorted(list(map(lambda x: int(x[1:]),
+                                                             list(stats_table.keys()))))
+
+    out_df = {'TxBw_port_0':[], 'TxBw_port_1':[], 'multiple':[]}
+    for column in columns:
+        if column not in out_df:
+            out_df[column] = []
+            
+    for folder in folders_sorted:
+        df = mean_df(stats_table, folder='m' + str(folder))
+    
+        #df['mean'].plot()
+        #print(f'\n---> {vendor} {test} {folder}')
+        #print(df['mean'][columns].describe().loc[['max']])
+        #out_df[folder] = df['mean'][columns].describe().loc[['max']]
+        for column in columns:
+            
+            out_df[column].append(float(df['mean'][column].describe().loc[['max']]))
+        out_df['multiple'].append(folder)
+        
+    out_df = pd.DataFrame(out_df)
+    out_df.set_index('multiple', inplace=True)
+    
+    return out_df
 
 def pandas_graph(info):
 
@@ -112,6 +145,75 @@ def pandas_graph(info):
 
         quit()
 
+def combined_graph(info, stat='mean',
+                                      x_axis = 'multiple', # <--sort and group, x-axis
+                                      y1_label='Throughput (Gbps)',
+                                      y2_label='Total-tx-bytes (GB)'):
+    dataframe_dict, names, rng = info
+    device_name, test_name = names
+    start, end = rng
+
+    max_df = get_max_test_data(device_name, test_name)
+    merged = pd.merge(dataframe_dict[stat], max_df, how='outer', on='multiple')
+    
+    #print(merged);
+    #quit()
+    '''
+    columns = ['TxBw_port_0', 'TxBw_port_1','maximum-latency (usec)', 'CpuUtilization (%)',
+                        'Total-pkt-drop (pkts)', 'average-latency (usec)',]
+    merged = merged[columns]
+    '''
+
+    ''' chng idx '''
+    if x_axis != 'multiple':
+        merged = merged.set_index(x_axis)
+    #merged.plot()
+    
+    
+    X = merged.index[start:end]
+    Y = merged.iloc[start:end]
+    fig, ax1 = plt.subplots()
+    #plt.plot(X, Y['TxBw_port_0'], label='TxBw_port_0')
+    ax1_label = y1_label
+    plt.plot(X, Y[ax1_label], color = 'purple',
+                 label=ax1_label, marker='+')
+    
+    plt.ylabel(ax1_label)
+    
+    plt.legend(loc='center left')
+    '''
+    legend loc
+                    best
+	upper right
+	upper left
+	lower left
+	lower right
+	right
+	center left
+	center right
+	lower center
+	upper center
+	center
+    '''
+    if x_axis in ['TxBw_port_0', 'TxBw_port_1']:
+        x_axis = "Throughput (Gbps)"
+    elif x_axis == 'Throughput (Gbps)':
+        x_axis = 'Summary Throughput (Gbps)'
+    plt.xlabel(x_axis)
+    
+
+    ax2 = ax1.twinx()
+    ax2_label = y2_label
+    #ax2.set(ylim=(-2, 10))
+    ax2.plot(X, Y[ax2_label], color = 'orange',
+             label = ax2_label, marker='x')
+    plt.ylabel(ax2_label)
+    
+    plt.legend(loc='lower center')
+    plt.title(f"{device_name} {test_name} Merged Level Tx")
+    
+    
+    plt.show()
 
 def graph(info, stat='mean',
                   sort_by_idx = 'multiple', # <--sort and group, x-axis
@@ -164,45 +266,61 @@ def graph(info, stat='mean',
     #'CpuUtilization (%)'
     axes[1].set(ylabel=y2_label, xlabel=sort_by_idx)
     
-    
-    #stack_figures(X,Y)
     plt.show()
     
 '''  
 Data Metrics Available:
 
-    "Throughput (Gbps)",
-    "maximum-latency (usec)",
-    "Total-pkt-drop (pkts)",
-    "Total-tx-bytes (GB)",
-    "average-latency (usec)",
+    "Throughput (Gbps)"
+    "maximum-latency (usec)"
+    "Total-pkt-drop (pkts)"
+    "Total-tx-bytes (GB)"
+    "average-latency (usec)"
     "CpuUtilization (%)" 
 
 Statistics Available for each Data Metric:
     stats_list = ["mean", "min", 
                           "max", "StdDev",
                           "num"]
-
+    --> assign with stat='stats_list'[idx]
 '''
 
 def main():
     
     x_axis = 'multiple'
-    val_range = [0, 19]
+    y1_label = 'CpuUtilization (%)' #"CpuUtilization"
+    y2_label = "maximum-latency (usec)"
+    
+    val_range = [0, 200]
     device_name = "Arista"
-    test_name = "multi_http_simple"
+    test_name =  'multi_sfr_delay_10_1g' #"multi_http_simple" 
+    get_max_test_data(device_name, test_name)
+
+    
     
     info = get_vendor_data(device_name, test_name,
                                                sort_by_idx = x_axis,
                                                start_end=val_range)
     
     #pandas_graph(info)
-    
+    '''
+    Combined graph included the following metrics
+    From get_max_test_data()
+        'TxBw_port_0'
+        'TxBw_port_1'
+        #,'drop-rate','currenttime']
+    '''
+    x_axis = 'TxBw_port_1'
+    combined_graph(info, x_axis=x_axis,
+                                    y1_label=y1_label,
+                                    y2_label=y2_label)
+    #quit()
+    '''
     graph(info,
             y1_label=            'Throughput (Gbps)',
             y2_label=            "maximum-latency (usec)",
             )
-    
+    '''
     #sort_by_idx="CpuUtilization (%)" )
     #y2_label='avg-latency (usec)'
     #
