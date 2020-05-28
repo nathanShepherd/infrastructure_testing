@@ -224,15 +224,24 @@ def read_pS_file(global_table, data_loc):
         
     titles, in_arr = in_arr[1], in_arr[2:]
     stats = {'throughput':[], 'retransmits':[]}
-    
-    for row in in_arr[:-2]: # skip empty newlines
-        row  = row[15:] # removing 'interval'
-        print(row)
-        gb_rate, row = row.split('ps')
+
+    # Select Throughput, retransmit cols by row in interval table
+    for row in in_arr[:-2]: # skip empty newlines and column headers
+
+        # Remove 'interval' (first column in table)
+        # TODO: convert interval times to hh:mm:ss
+        
+        row  = row[15:] 
+        #print(row)
+        gb_rate, row = row.split('ps') # split on Gb(ps), Mb(ps), ...
         if gb_rate[-2:] == 'Mb':
             gb_rate = float(gb_rate[:-2]) /1024
-        else:
+        elif gb_rate[-2:] == 'Gb':
             gb_rate = float(gb_rate[:-2])
+        else:
+            print(f"Unsupported scale in Throughput: {gb_rate}")
+            quit()
+            
         stats['throughput'].append(gb_rate)
         stats['retransmits'].append(int(row[4:11]))
 
@@ -250,7 +259,7 @@ def get_pS_throughput(vendor='Arista', test='pSControl'):
 def graph_pS(vendor='Arista', test='pSControl'):
     stats_table = get_pS_throughput(vendor, test)
     all_files = []
-        
+    
     for i, file in enumerate(stats_table):
         g = pd.DataFrame(stats_table[file])
         all_files.append(g)
@@ -273,6 +282,30 @@ def graph_pS(vendor='Arista', test='pSControl'):
     plt.title(vendor + " " + test)
     plt.show()
 
+def get_pS_data(vendor='Arista', test='pSControl'):
+    stats_table = get_pS_throughput(vendor, test)
+    all_files = []
+    
+    for i, file in enumerate(stats_table):
+        g = pd.DataFrame(stats_table[file])
+        all_files.append(g)
+
+        #print(all_files[0].columns)
+
+    mean_df = {} # mean of all files in folder for all tests
+    for col in all_files[0].columns:
+            
+        values = []
+        for file in all_files:
+            values.append(file[col].values)
+                
+        values = np.array(values)
+
+        mean_df[col] = np.mean(values.T, axis=1)
+
+    df = pd.DataFrame(mean_df)
+    return df
+    
 def single_file_stats():
     
     stats_table = global_tx_stats('Arista', 'control_sfr_delay_10_1g_6cores',
@@ -334,7 +367,7 @@ def plot_single_folder(vendor='Arista', test='multi_http_simple', folder='m10100
 
 if __name__ == "__main__":
     #plot_all_folders()
-    describe_all(test='multi_sfr_delay_10_1g')# control_http_6cores 
+    describe_all(test='control_http_6cores')# pS_Simult_http_6cores control_http_6cores 
     #single_file_stats()
     #plot_single_folder(test='pS_Simult_http_6cores',folder = 'm101000')
     #plot_single_folder(test='control_sfr_delay_10_1g_6cores',folder = 'm21')

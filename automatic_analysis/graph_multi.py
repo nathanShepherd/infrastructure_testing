@@ -167,8 +167,10 @@ def combined_graph(info, stat='mean',
     ''' chng idx '''
     if x_axis != 'multiple':
         merged = merged.set_index(x_axis)
-    #merged.plot()
-    
+
+    merged.describe().plot.bar()
+    plt.show()
+    quit()
     
     X = merged.index[start:end]
     Y = merged.iloc[start:end]
@@ -288,12 +290,13 @@ Statistics Available for each Data Metric:
 def main():
     
     x_axis = 'multiple'
+    combined_x_axis = 'TxBw_port_1'
     y1_label = 'CpuUtilization (%)' #"CpuUtilization"
-    y2_label = "maximum-latency (usec)"
+    y2_label = "average-latency (usec)"
     
     val_range = [0, 200]
     device_name = "Arista"
-    test_name =  'multi_sfr_delay_10_1g' #"multi_http_simple" 
+    test_name =  'multi_many_clients' #"multi_http_simple" 
     get_max_test_data(device_name, test_name)
 
     
@@ -310,8 +313,8 @@ def main():
         'TxBw_port_1'
         #,'drop-rate','currenttime']
     '''
-    x_axis = 'TxBw_port_1'
-    combined_graph(info, x_axis=x_axis,
+   
+    combined_graph(info, x_axis=combined_x_axis,
                                     y1_label=y1_label,
                                     y2_label=y2_label)
     #quit()
