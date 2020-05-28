@@ -7,8 +7,6 @@ no_bundle = "sfr_delay_10_1g_no_bundeling"
 _exe = "./t-rex-64 "
 OUT = "/opt/trex/v2.57/test_dir/"
 
-# TODO:	Define dictionary T in separate yaml file
-
 # Dictionary T (test) defines each test including the associated executable
 # Usage: T[ testname ] returns TRex command for test type "testname"
 T = {"pS_thruput":"",
