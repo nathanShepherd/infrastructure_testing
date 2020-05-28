@@ -376,24 +376,29 @@ def graph_pS(vendor='Arista', test='pSControl'):
     max_df = get_max_test_data(vendor, 'multi_http_both_ports_client')
     
     #max_df.rename({'currenttime': 'interval'}, inplace=True)
-    trex_times = max_df[['currenttime']].values.flatten()
-    for i in range(len(trex_times)):
-        trex_times[i] = int(trex_times[i])
-    curr_t = pd.DataFrame({'currenttime': trex_times,
-                                                'interval':trex_times}, index=trex_times)
-    #
-   
     
-    trex_df = pd.merge(max_df, curr_t, how='inner', on='currenttime')
+    interv_times = max_df[['currenttime']].values.flatten()
+    curr_times = interv_times
+    for i in range(len(curr_times)):        
+        interv_times[i] = int(curr_times[i])
+    curr_t = pd.DataFrame({'currenttime': curr_times,
+                                                'interval':interv_times})#, index=trex_times)
     
-    #print(trex_df); quit()
+    #print(max_df)
+    trex_df = pd.merge(max_df, curr_t, how='outer', on='currenttime')
+    
+    print(trex_df); quit()
 
     
     #print( df)
-    merged = pd.merge(df, trex_df, how='outer', on='interval')
+    merged = pd.merge(df, trex_df, how='inner', on='interval')
 
     merged.set_index('interval', inplace=True)
     print(merged)
+    
+    ## TODO: Combine max_df and trex_df on interval ##
+    # Calculate time since start of test to allign intervals
+    
     #df.rename(columns ={'throughput': 'Arista_pS_Throughput'})
     df.plot()
     plt.title(vendor + " " + test)
