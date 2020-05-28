@@ -53,13 +53,16 @@ def get_multiplier_data_pts(title):
 	out = OUT + dir_name
 	system("mkdir " + out)
 
-        max_multi = 1000011
-	step_multi = 100001
-	start_multi = max(1, 1)
+	end_multiplier = 1.1e1
+	start_multiplier = 1
 	num_test = 1
+	
+	
+	step_multi = round((end_multiplier - start_multiplier) / num_test)
+	
 	ts = time()# start of multi_test
 
-	for m in range(start_multi, max_multi, step_multi):
+	for m in range(start_multiplier, end_multiplier, step_multi):
 		sub_dir = out +'/'+ 'm' + str(m)
 		
 		system("mkdir " + sub_dir)
@@ -86,7 +89,7 @@ def get_multiplier_data_pts(title):
 				print("duration of last test " + str(t_elapsed/60) + " min")
 
 				t_remain = t_elapsed * num_test
-				t_remain *= ((max_multi - m - start_multi) / step_multi)
+				t_remain *= ((end_multiplier - m - start_multiplier) / step_multi)
 				t_remain = round(t_remain/60, 1)
 				t_remain = str(t_remain) +" minutes"
 				print("Estimated time remain "+ t_remain)
