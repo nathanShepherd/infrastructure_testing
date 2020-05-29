@@ -1,5 +1,5 @@
 from analysis import get_data, title_stats
-from parse_global_stats import global_tx_stats, mean_df
+from parse_global_stats import * #global_tx_stats, mean_df, get_pS_data
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -34,7 +34,6 @@ def select_from(data, where=""):
     
     for metric in data[example]:
             df[metric] = []
-
     
     for dir_name in directories:
         df['multiple'].append( int(dir_name[1:]) )
@@ -168,14 +167,21 @@ def combined_graph(info, stat='mean',
     if x_axis != 'multiple':
         merged = merged.set_index(x_axis)
 
+    '''
     merged.describe().plot.bar()
     plt.show()
     quit()
-    
+    '''
     X = merged.index[start:end]
     Y = merged.iloc[start:end]
     fig, ax1 = plt.subplots()
     #plt.plot(X, Y['TxBw_port_0'], label='TxBw_port_0')
+
+    if x_axis == 'currenttime':
+        X = list( map(lambda x: x/60, X))
+        x_axis = 'currenttime (min)'
+        #print(X)
+    
     ax1_label = y1_label
     plt.plot(X, Y[ax1_label], color = 'purple',
                  label=ax1_label, marker='+')
@@ -270,16 +276,11 @@ def graph(info, stat='mean',
     
     plt.show()
     
-'''  
-Data Metrics Available:
 
-    "Throughput (Gbps)"
-    "maximum-latency (usec)"
-    "Total-pkt-drop (pkts)"
-    "Total-tx-bytes (GB)"
-    "average-latency (usec)"
-    "CpuUtilization (%)" 
+'''
 
+'''
+'''
 Statistics Available for each Data Metric:
     stats_list = ["mean", "min", 
                           "max", "StdDev",
@@ -290,14 +291,34 @@ Statistics Available for each Data Metric:
 def main():
     
     x_axis = 'multiple'
-    combined_x_axis = 'TxBw_port_1'
-    y1_label = 'CpuUtilization (%)' #"CpuUtilization"
-    y2_label = "average-latency (usec)"
+    '''  
+    Possible x_axis for summary_data:
+        'multiple'
+        "Throughput (Gbps)"
+        "maximum-latency (usec)"
+        "Total-pkt-drop (pkts)"
+        "Total-tx-bytes (GB)"
+        "average-latency (usec)"
+        "CpuUtilization (%)"
+    '''
+    combined_x_axis = 'currenttime' #'multiple' # ''TxBw_port_1'
+    '''
+    Possible combined_x_axis
+    from  combined summary and max_lvl TRex data:
+        # TODO: add multiple to this list
+        ['obytes_port_0', 'obytes_port_1', 'ierrors_port_0', 'ierrors_port_1',
+       'TxBw_port_0', 'TxBw_port_1', 'CpuUtilization', 'Total-Tx', 'drop-rate',
+       'currenttime', 'testduration',]
+    '''
+
+    # Possible y-labels are all possible x_axes
+    y1_label = 'CpuUtilization' 
+    y2_label = 'Total-Tx'
     
     val_range = [0, 200]
     device_name = "Arista"
-    test_name =  'multi_many_clients' #"multi_http_simple" 
-    get_max_test_data(device_name, test_name)
+    test_name =  'multi_http_both_ports_client' #"multi_http_simple" 
+    #get_max_test_data(device_name, test_name)
 
     
     
@@ -327,7 +348,64 @@ def main():
     #sort_by_idx="CpuUtilization (%)" )
     #y2_label='avg-latency (usec)'
     #
+def graph_pS(vendor='Arista', test='pSControl'):
+    stats_table = get_pS_throughput(vendor, test)
+    all_files = []
+    
+    for i, file in enumerate(stats_table):
+        g = pd.DataFrame(stats_table[file])
+        all_files.append(g)
+
+        #print(all_files[0].columns)
+
+    mean_df = {} # mean of all files in folder for all tests
+    for col in all_files[0].columns:
+            
+        values = []
+        for file in all_files:
+            values.append(file[col].values)
+                
+        values = np.array(values)
+
+        mean_df[col] = np.mean(values.T, axis=1)
+
+    df = pd.DataFrame(mean_df)
+    #df = df[['pS_throughput']]
+
+    # Collect Trex Data
+    max_df = get_max_test_data(vendor, 'multi_http_both_ports_client')
+    
+    #max_df.rename({'currenttime': 'interval'}, inplace=True)
+    
+    interv_times = max_df[['currenttime']].values.flatten()
+    curr_times = interv_times
+    for i in range(len(curr_times)):        
+        interv_times[i] = int(curr_times[i])
+    curr_t = pd.DataFrame({'currenttime': curr_times,
+                                                'interval':interv_times})#, index=trex_times)
+    
+    #print(max_df)
+    trex_df = pd.merge(max_df, curr_t, how='outer', on='currenttime')
+    
+    print(trex_df); quit()
+
+    
+    #print( df)
+    merged = pd.merge(df, trex_df, how='inner', on='interval')
+
+    merged.set_index('interval', inplace=True)
+    print(merged)
+    
+    ## TODO: Combine max_df and trex_df on interval ##
+    # Calculate time since start of test to allign intervals
+    
+    #df.rename(columns ={'throughput': 'Arista_pS_Throughput'})
+    df.plot()
+    plt.title(vendor + " " + test)
+    plt.xlabel('Time since start of test (sec)')
+    plt.show()
     
 if __name__ == "__main__":
-    main()
+    #main()
+    graph_pS(vendor='Arista', test='pSControl')
 

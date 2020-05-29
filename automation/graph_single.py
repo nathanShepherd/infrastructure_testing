@@ -26,8 +26,8 @@ def bar_pS_data(vendor='Arista', test='pS_Simult_with_trexhttp_6cores'):
     # pS_Simult_with_trexhttp_6cores
     rows = ['mean', 'max']
     df = get_pS_data(vendor, test)
-    df = df.describe()
-    print(df)
+    df_desc = df.describe()
+    print(df_desc)
     
     df.plot.bar()
     plt.show()
