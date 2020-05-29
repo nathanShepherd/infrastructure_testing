@@ -350,7 +350,7 @@ def main():
     #sort_by_idx="CpuUtilization (%)" )
     #y2_label='avg-latency (usec)'
     #
-def graph_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
+def graph_Simult_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
              trex_test='simult_pS_throughput_http_6cores'):
     stats_table = get_pS_throughput(vendor, ps_test)
     all_files = []
@@ -360,7 +360,7 @@ def graph_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
         all_files.append(g)
 
         #print(all_files[0].columns)
-
+    '''
     pS_df = {} # mean of all files in folder for all tests
     for col in all_files[0].columns:
             
@@ -371,10 +371,11 @@ def graph_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
         values = np.array(values)
 
         pS_df[col] = np.mean(values.T, axis=1)
-
-    pS_df = pd.DataFrame(pS_df)
-    #df = df[['pS_throughput']]
-
+    '''
+    
+    
+    pS_df = pd.concat(all_files)
+    #pS_df = pS_df.groupby('datetime').agg(aggregate)#.sort_index()
     print(pS_df)
     
     # Collect Trex Data
@@ -385,9 +386,32 @@ def graph_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
             tx_df.append(tx_data[folder][file].head())
 
     tx_df = pd.concat(tx_df)
+    tx_df['datetime'] = tx_df[['datetime']] - pd.to_timedelta("18:59:21")
+    #tx_df = tx_df.groupby('datetime').agg(aggregate)#.sort_index()
     print(tx_df)
-            
-    # df.groupby('A').agg('min')
+
+    merged = pd.merge(pS_df, tx_df, how='outer', on='datetime')
+
+    ''' merged cols
+        ['pS_throughput', 'retransmits', 'interval', 'obytes_port_0',
+       'obytes_port_1', 'ierrors_port_0', 'ierrors_port_1', 'TxBw_port_0',
+       'TxBw_port_1', 'CpuUtilization', 'Total-Tx', 'drop-rate', 'currenttime',
+       'testduration']
+    '''
+    
+    aggregate = 'min'
+    #merged = merged.groupby('datetime').agg(aggregate)
+    x_axis = 'TxBw_port_1'
+    merged['trex_throughput'] = merged[x_axis]
+    merged = merged.set_index(x_axis).sort_index()
+    
+    #y_axis= ['pS_throughput','TxBw_port_0' ]
+    #merged = merged[y_axis]
+    print(merged)
+    
+    merged.plot.scatter('trex_throughput', 'pS_throughput')
+    plt.show()
+    
     #max_df = get_max_tx_data(vendor, trex_test)
     #print(max_df.head())
     #max_df.rename({'currenttime': 'interval'}, inplace=True)
@@ -397,7 +421,8 @@ def graph_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
     # Arista: 29May2020_01h46m50s,  trex: 28May2020_20h46m11s
     
     # Difference in clocks, Arista is 5hrs, 1min, 37sec ahead
-    
+    # pd.to_timedelta('20:46:11') -  pd.to_timedelta('1:46:50', unit='second')
+    # ==  18:59:21 
     '''
     interv_times = max_df[['currenttime']].values.flatten()
     curr_times = interv_times
@@ -432,5 +457,5 @@ def graph_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
     
 if __name__ == "__main__":
     #main()
-    graph_pS(vendor='Arista', ps_test='pSControl')
+    graph_Simult_pS(vendor='Arista')
 

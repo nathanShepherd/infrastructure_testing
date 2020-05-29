@@ -129,7 +129,7 @@ def read_file(file_loc):
     start_date = file.split('_')[-1].replace('h', ':').replace('m',':').replace('s','')
     start_date = str(start_date +' ') * len(stats_table['currenttime'])
     start_date = pd.DataFrame({'datetime':start_date.split(' ')[:-1]})
-    start_date = pd.to_timedelta(start_date.values.flatten())
+    start_date = pd.to_datetime(start_date.values.flatten())
 
     stats_table = pd.DataFrame(stats_table)
     stats_table['datetime'] = start_date + pd.to_timedelta(stats_table['currenttime'].round(0), unit='S')
@@ -225,7 +225,7 @@ def read_pS_file(global_table, data_loc):
         
 
         
-    start_date = intro.split('Starts ')[-1].split(' (')[0].split('T')[-1][:-3]
+    
     
     titles, in_arr = in_arr[1], in_arr[2:]
     stats = {'pS_throughput':[], 'retransmits':[], 'interval':[]}
@@ -256,11 +256,14 @@ def read_pS_file(global_table, data_loc):
 
     file = data_loc.split('/')[-1]
     df = pd.DataFrame(stats)
-    
+
+    #start_date = intro.split('Starts ')[-1].split(' (')[0].split('T')[-1][:-3]
+    print(file, data_loc)
+    start_date = file.split('_')[-1].replace('h', ':').replace('m',':').replace('s', '')
     start_date = str(start_date +' ') * len(df['interval'].values)
     start_date = pd.DataFrame({'date':start_date.split(' ')[:-1]})
-    #print(start_date.values)
-    start_date = pd.to_timedelta(start_date.values.flatten())
+    print(start_date.values)
+    start_date = pd.to_datetime(start_date.values.flatten())
     print(start_date)
     
     df['datetime'] =  start_date + pd.to_timedelta(df['interval'], unit='S')
@@ -268,7 +271,7 @@ def read_pS_file(global_table, data_loc):
     
     #global_table[file].set_index('interval', inplace=True)
         
-def get_pS_throughput(vendor='Arista', test='pSControl'):
+def get_pS_throughput(vendor='Arista', test='pS_Control'):
     data_loc = '../vendor_data/' + vendor +'/' +test +'/'
     global_table = {}
 
