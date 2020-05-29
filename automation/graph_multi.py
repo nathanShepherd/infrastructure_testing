@@ -92,10 +92,10 @@ def get_vendor_data(device_name, test_name,
     
     return dataframe_dict, names, start_end
 
-def get_max_test_data(vendor, test):
+def get_max_tx_data(vendor, test):
     ''' Max test statistic for each division in full TRex Output'''
     stats_table = global_tx_stats( vendor, test, folder=None)
-
+        
     #columns = ['TxBw_port_0', 'TxBw_port_1']#,'drop-rate','currenttime']
     columns = ['obytes_port_0', 'obytes_port_1', 'ierrors_port_0', 'ierrors_port_1',
        'TxBw_port_0', 'TxBw_port_1', 'CpuUtilization', 'Total-Tx', 'drop-rate',
@@ -109,7 +109,8 @@ def get_max_test_data(vendor, test):
     for column in columns:
         if column not in out_df:
             out_df[column] = []
-            
+
+    
     for folder in folders_sorted:
         df = mean_df(stats_table, folder='m' + str(folder))
     
@@ -117,13 +118,14 @@ def get_max_test_data(vendor, test):
         #print(f'\n---> {vendor} {test} {folder}')
         #print(df['mean'][columns].describe().loc[['max']])
         #out_df[folder] = df['mean'][columns].describe().loc[['max']]
+        
         for column in columns:
             
             out_df[column].append(float(df['mean'][column].describe().loc[['max']]))
         out_df['multiple'].append(folder)
-        
+
     out_df = pd.DataFrame(out_df)
-    out_df.set_index('multiple', inplace=True)
+    #out_df.set_index('multiple', inplace=True)
     
     return out_df
 
@@ -242,7 +244,7 @@ def graph(info, stat='mean',
     print(Y.head(), "\n Y Shape: ", Y.shape)
     #print(len(X), Y.shape)
     
-    # Bar grapht
+    # Bar graph
     width = .4
     x_idx = np.arange(len(X))
     plt.bar(x_idx, Y[y1_label], width=width,
@@ -317,7 +319,7 @@ def main():
     
     val_range = [0, 200]
     device_name = "Arista"
-    test_name =  'multi_http_both_ports_client' #"multi_http_simple" 
+    test_name =  'pS_Control_throughput_28May2020' #"multi_http_simple" 
     #get_max_test_data(device_name, test_name)
 
     
@@ -348,8 +350,9 @@ def main():
     #sort_by_idx="CpuUtilization (%)" )
     #y2_label='avg-latency (usec)'
     #
-def graph_pS(vendor='Arista', test='pSControl'):
-    stats_table = get_pS_throughput(vendor, test)
+def graph_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
+             trex_test='simult_pS_throughput_http_6cores'):
+    stats_table = get_pS_throughput(vendor, ps_test)
     all_files = []
     
     for i, file in enumerate(stats_table):
@@ -358,7 +361,7 @@ def graph_pS(vendor='Arista', test='pSControl'):
 
         #print(all_files[0].columns)
 
-    mean_df = {} # mean of all files in folder for all tests
+    pS_df = {} # mean of all files in folder for all tests
     for col in all_files[0].columns:
             
         values = []
@@ -367,16 +370,35 @@ def graph_pS(vendor='Arista', test='pSControl'):
                 
         values = np.array(values)
 
-        mean_df[col] = np.mean(values.T, axis=1)
+        pS_df[col] = np.mean(values.T, axis=1)
 
-    df = pd.DataFrame(mean_df)
+    pS_df = pd.DataFrame(pS_df)
     #df = df[['pS_throughput']]
 
+    print(pS_df)
+    
     # Collect Trex Data
-    max_df = get_max_test_data(vendor, 'multi_http_both_ports_client')
-    
+    tx_data = global_tx_stats('Arista', trex_test)
+    tx_df = []
+    for folder in tx_data:
+        for file in tx_data[folder]:
+            tx_df.append(tx_data[folder][file].head())
+
+    tx_df = pd.concat(tx_df)
+    print(tx_df)
+            
+    # df.groupby('A').agg('min')
+    #max_df = get_max_tx_data(vendor, trex_test)
+    #print(max_df.head())
     #max_df.rename({'currenttime': 'interval'}, inplace=True)
+
+    # At the same time Arista ==  01:03:13, trex = 20:02:40
+    # python datetime is different on each device
+    # Arista: 29May2020_01h46m50s,  trex: 28May2020_20h46m11s
     
+    # Difference in clocks, Arista is 5hrs, 1min, 37sec ahead
+    
+    '''
     interv_times = max_df[['currenttime']].values.flatten()
     curr_times = interv_times
     for i in range(len(curr_times)):        
@@ -387,7 +409,7 @@ def graph_pS(vendor='Arista', test='pSControl'):
     #print(max_df)
     trex_df = pd.merge(max_df, curr_t, how='outer', on='currenttime')
     
-    print(trex_df); quit()
+    
 
     
     #print( df)
@@ -395,17 +417,20 @@ def graph_pS(vendor='Arista', test='pSControl'):
 
     merged.set_index('interval', inplace=True)
     print(merged)
-    
+    print(trex_df); quit()
+    '''
     ## TODO: Combine max_df and trex_df on interval ##
     # Calculate time since start of test to allign intervals
     
     #df.rename(columns ={'throughput': 'Arista_pS_Throughput'})
+    '''
     df.plot()
     plt.title(vendor + " " + test)
     plt.xlabel('Time since start of test (sec)')
     plt.show()
+    '''
     
 if __name__ == "__main__":
     #main()
-    graph_pS(vendor='Arista', test='pSControl')
+    graph_pS(vendor='Arista', ps_test='pSControl')
 

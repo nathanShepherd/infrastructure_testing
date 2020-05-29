@@ -125,8 +125,15 @@ def read_file(file_loc):
 
         #print(stats_table)                    
         #quit()
-        
-        
+    
+    start_date = file.split('_')[-1].replace('h', ':').replace('m',':').replace('s','')
+    start_date = str(start_date +' ') * len(stats_table['currenttime'])
+    start_date = pd.DataFrame({'datetime':start_date.split(' ')[:-1]})
+    start_date = pd.to_timedelta(start_date.values.flatten())
+
+    stats_table = pd.DataFrame(stats_table)
+    stats_table['datetime'] = start_date + pd.to_timedelta(stats_table['currenttime'].round(0), unit='S')
+    
     #print(in_arr)
     #print(stats_table)
     return stats_table
@@ -137,7 +144,7 @@ def read_directory(file_table, data_loc, folder):
     for file in listdir(data_loc +folder):
             file_table[folder][file] = read_file(data_loc + folder +'/'+ file)
         
-def global_tx_stats(vendor, test, folder='m11'):
+def global_tx_stats(vendor, test, folder=None):
     # "get flow level data"
     
     
@@ -167,7 +174,6 @@ def mean_df(stats_table, folder=None):
     ''' Summarize test statitics from a directory of folders
         Each folder contains multiple tests run with the same parameters'''
     
-    
     stats_list = ["mean", "min", "max", "variance","num"]
     out_df = {} # summary statistics for sample from folder
 
@@ -176,15 +182,13 @@ def mean_df(stats_table, folder=None):
         all_files = []
         
         for i, file in enumerate(stats_table[folder]):
-            g = pd.DataFrame(stats_table[folder][file],
-                                             index=stats_table[folder][file]['currenttime'])
+            g = pd.DataFrame(stats_table[folder][file])
             all_files.append(g)
 
         #print(all_files[0].columns)
 
-        mean_df = {} # mean of all files in folder for all tests
-        for col in all_files[0].columns:
-            
+        mean_df = {} # mean of all files in folder for all tests        
+        for col in all_files[0].columns:    
             values = []
             for file in all_files:
                 values.append(file[col].values)
@@ -193,9 +197,8 @@ def mean_df(stats_table, folder=None):
 
             mean_df[col] = np.mean(values.T, axis=1)
 
-            
-            
-        out_df['mean'] = pd.DataFrame(mean_df, index=mean_df['currenttime'])
+                    
+        out_df['mean'] = pd.DataFrame(mean_df) #, index=mean_df['currenttime'])
             
         return out_df
 
@@ -211,17 +214,19 @@ def mean_df(stats_table, folder=None):
         '''
 def read_pS_file(global_table, data_loc):
     in_arr = []
+    test_init = ''
     with open(data_loc, "r") as f:
         # Skip initializer info, get full text data
 
         intro, full_test = f.read().split('* Stream ID 5')
-
-        #print(full_test, '\n %%%%%%%')
-        #print(summary, '\n %%%%%%%')
-        #quit()
         
         in_arr = full_test.split("Summary")[0].split('\n')
+        test_init = intro
         
+
+        
+    start_date = intro.split('Starts ')[-1].split(' (')[0].split('T')[-1][:-3]
+    
     titles, in_arr = in_arr[1], in_arr[2:]
     stats = {'pS_throughput':[], 'retransmits':[], 'interval':[]}
 
@@ -232,10 +237,11 @@ def read_pS_file(global_table, data_loc):
         #print(row[:15].replace(' ', '').split('-')); quit()
         interval = int(row[:15].replace(' ', '').split('-')[-1].split('.')[0])
         
-        
         row  = row[15:] 
         #print(row)
         gb_rate, row = row.split('ps') # split on Gb(ps), Mb(ps), ...
+        if gb_rate[-2:] == 'Kb':
+            gb_rate = (float(gb_rate[:-2]) /1024) / 1024
         if gb_rate[-2:] == 'Mb':
             gb_rate = float(gb_rate[:-2]) /1024
         elif gb_rate[-2:] == 'Gb':
@@ -249,7 +255,17 @@ def read_pS_file(global_table, data_loc):
         stats['retransmits'].append(int(row[4:11]))
 
     file = data_loc.split('/')[-1]
-    global_table[file] = pd.DataFrame(stats)
+    df = pd.DataFrame(stats)
+    
+    start_date = str(start_date +' ') * len(df['interval'].values)
+    start_date = pd.DataFrame({'date':start_date.split(' ')[:-1]})
+    #print(start_date.values)
+    start_date = pd.to_timedelta(start_date.values.flatten())
+    print(start_date)
+    
+    df['datetime'] =  start_date + pd.to_timedelta(df['interval'], unit='S')
+    global_table[file] = pd.DataFrame(df)
+    
     #global_table[file].set_index('interval', inplace=True)
         
 def get_pS_throughput(vendor='Arista', test='pSControl'):
@@ -348,9 +364,11 @@ def plot_single_folder(vendor='Arista', test='multi_http_simple', folder='m10100
 if __name__ == "__main__":
     #plot_all_folders()
     #describe_all(test='control_http_6cores')# pS_Simult_http_6cores control_http_6cores
-    
+
+    read_file('../vendor_data/Arista/All_Flows_28May2020/cap2_http_simple_yaml/m1/02h15m34s')
     #single_file_stats()
     #plot_single_folder(test='pS_Simult_http_6cores',folder = 'm101000')
     #plot_single_folder(test='control_sfr_delay_10_1g_6cores',folder = 'm21')
     #get_pS_throughput()
-    graph_pS()
+    #graph_pS()
+    #print(get_pS_throughput('Arista', 'pS_Control_throughput_28May2020'))
