@@ -400,9 +400,10 @@ def graph_Simult_pS(vendor='Arista', ps_test='pS_Simult_throughput_29May2020',
     '''
     
     aggregate = 'min'
-    #merged = merged.groupby('datetime').agg(aggregate)
+    
     x_axis = 'TxBw_port_1'
     merged['trex_throughput'] = merged[x_axis]
+    merged = merged.groupby('datetime').agg(aggregate)
     merged = merged.set_index(x_axis).sort_index()
     
     #y_axis= ['pS_throughput','TxBw_port_0' ]
