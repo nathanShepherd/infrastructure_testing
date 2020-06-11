@@ -43,8 +43,17 @@ def read_file(file_loc):
     in_arr = []
     with open(file_loc, "r") as f:
         # Skip initializer info, get full text data
-
-        full_test, summary = f.read().split(' *** TRex is shutting down ')
+        file_txt = f.read()
+        
+        if  file_txt.find(' *** TRex is shutting down ') != -1:
+            full_test, summary = file_txt.split(' *** TRex is shutting down ')
+        else:
+            print(file_txt)
+            file_loc = file_loc.split('/')[-4:]
+            file_loc = str(file_loc[:2]) + '\n' + str(file_loc[-2:])
+            print('\n%%%%% \n Interrupted TRex test at:\n', file_loc )
+            #return pd.DataFrame({})
+            
 
         #print(full_test, '\n %%%%%%%')
         #print(summary, '\n %%%%%%%')
@@ -59,7 +68,7 @@ def read_file(file_loc):
         
         per_port, global_stats = part.split('-Global stats enabled')
 
-        global_stats = global_stats.split('-Latency stats enabled')[0]
+        global_stats, latency_stats = global_stats.split('-Latency stats enabled')
         
         for row in per_port.split('\n')[3:-2]:
             ''' Collect TRex output for each port '''
@@ -120,16 +129,29 @@ def read_file(file_loc):
                 elif metric == 'CpuUtilization':
                     stats_table[metric].append(float(stat.split('%')[0]))
                 
+                    
+                
             else: # TODO:  Active & Open rows
                 pass
-
+            
+            
+        avg_latency_0 = int(latency_stats.split(' 0 |')[1].split(',')[4])
+        avg_latency_1 = int(latency_stats.split(' 1 |')[1].split(',')[4])
+        if 'average_latency_port_1' not in stats_table:
+            stats_table['average_latency_port_1'] = []
+        if 'average_latency_port_0' not in stats_table:
+            stats_table['average_latency_port_0'] = []
+            
+        stats_table['average_latency_port_1'].append(avg_latency_1)
+        stats_table['average_latency_port_0'].append(avg_latency_0)
         #print(stats_table)                    
         #quit()
-    
+
+    #import pdb; pdb.set_trace()
     start_date = file.split('_')[-1].replace('h', ':').replace('m',':').replace('s','')
     start_date = str(start_date +' ') * len(stats_table['currenttime'])
     start_date = pd.DataFrame({'datetime':start_date.split(' ')[:-1]})
-    start_date = pd.to_timedelta(start_date.values.flatten())
+    start_date = pd.to_datetime(start_date.values.flatten())
 
     stats_table = pd.DataFrame(stats_table)
     stats_table['datetime'] = start_date + pd.to_timedelta(stats_table['currenttime'].round(0), unit='S')
@@ -165,17 +187,19 @@ def global_tx_stats(vendor, test, folder=None):
             # Remove below to get more files    
             #break
     #print(global_table)
-    print(global_table.keys())
+    #print(global_table.keys())
     return global_table
 
 
 
-def mean_df(stats_table, folder=None):
+def collect_agg_files(stats_table, folder=None):
     ''' Summarize test statitics from a directory of folders
         Each folder contains multiple tests run with the same parameters'''
     
     stats_list = ["mean", "min", "max", "variance","num"]
     out_df = {} # summary statistics for sample from folder
+
+    
 
     if folder != None:
 
@@ -185,20 +209,12 @@ def mean_df(stats_table, folder=None):
             g = pd.DataFrame(stats_table[folder][file])
             all_files.append(g)
 
-        #print(all_files[0].columns)
 
-        mean_df = {} # mean of all files in folder for all tests        
-        for col in all_files[0].columns:    
-            values = []
-            for file in all_files:
-                values.append(file[col].values)
-                
-            values = np.array(values)
+        all_files = pd.concat(all_files)
 
-            mean_df[col] = np.mean(values.T, axis=1)
-
-                    
-        out_df['mean'] = pd.DataFrame(mean_df) #, index=mean_df['currenttime'])
+        out_df['mean'] = all_files.mean()
+        out_df['max'] = all_files.max()
+        
             
         return out_df
 
@@ -225,7 +241,7 @@ def read_pS_file(global_table, data_loc):
         
 
         
-    start_date = intro.split('Starts ')[-1].split(' (')[0].split('T')[-1][:-3]
+    
     
     titles, in_arr = in_arr[1], in_arr[2:]
     stats = {'pS_throughput':[], 'retransmits':[], 'interval':[]}
@@ -256,19 +272,22 @@ def read_pS_file(global_table, data_loc):
 
     file = data_loc.split('/')[-1]
     df = pd.DataFrame(stats)
-    
+
+    #start_date = intro.split('Starts ')[-1].split(' (')[0].split('T')[-1][:-3]
+    print(file, data_loc)
+    start_date = file.split('_')[-1].replace('h', ':').replace('m',':').replace('s', '')
     start_date = str(start_date +' ') * len(df['interval'].values)
     start_date = pd.DataFrame({'date':start_date.split(' ')[:-1]})
     #print(start_date.values)
-    start_date = pd.to_timedelta(start_date.values.flatten())
-    print(start_date)
+    start_date = pd.to_datetime(start_date.values.flatten())
+    #print(start_date)
     
     df['datetime'] =  start_date + pd.to_timedelta(df['interval'], unit='S')
     global_table[file] = pd.DataFrame(df)
     
     #global_table[file].set_index('interval', inplace=True)
         
-def get_pS_throughput(vendor='Arista', test='pSControl'):
+def get_pS_throughput(vendor='Arista', test='pS_Control'):
     data_loc = '../vendor_data/' + vendor +'/' +test +'/'
     global_table = {}
 
@@ -278,7 +297,7 @@ def get_pS_throughput(vendor='Arista', test='pSControl'):
                 
 
 
-def get_pS_data(vendor='Arista', test='pSControl'):
+def get_pS_data(vendor='Arista', test='pSControl', group_by='pS_throughput'):
     stats_table = get_pS_throughput(vendor, test)
     all_files = []
     
@@ -288,7 +307,15 @@ def get_pS_data(vendor='Arista', test='pSControl'):
 
         #print(all_files[0].columns)
 
+    
+    
     mean_df = {} # mean of all files in folder for all tests
+
+    all_files = pd.concat(all_files)
+    df = all_files
+    #df = all_files.groupby(group_by).agg('max') #.set_index()
+    
+    '''
     for col in all_files[0].columns:
             
         values = []
@@ -299,8 +326,13 @@ def get_pS_data(vendor='Arista', test='pSControl'):
 
         mean_df[col] = np.mean(values.T, axis=1)
 
-    df = pd.DataFrame(mean_df)
+    '''
+
+    #df = pd.DataFrame(mean_df)
     return df
+
+
+#get_pS_data(vendor='Arista', test='pSControl_5May2020')
     
 def single_file_stats():
     
