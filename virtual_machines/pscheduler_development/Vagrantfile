@@ -1,0 +1,46 @@
+# Network Infrastructure testing for pScheduler
+# Developed by Nathan Shepherd for UofM:ITS
+
+# -*- mode: ruby -*-
+# # vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define "server" do |server|
+
+    server.vm.box = "centos/7"
+
+    server.vm.network "public_network", ip: "172.28.128.3" #type: "dhcp"
+
+    server.vm.hostname = "server"
+
+    server.vm.provision "shell", inline: <<-SHELL
+       # Configure yum
+       sudo yum -y epel-release
+       sudo yum clean all 
+
+       # Install Ansible
+       sudo yum -y install python python-pip
+       sudo pip install ansible
+
+       # Install cloud services
+       sudo yum install git wget
+
+       # Install centos virtual box provider for vagrant
+       sudo yum -y install gcc make perl kernel-devel kernel-devel-3.10.0-1127.el7.x86_64
+       wget https://download.virtualbox.org/virtualbox/6.1.10/VirtualBox-6.1-6.1.10_138449_el7-1.x86_64.rpm
+       sudo yum -y install VirtualBox-6.1-6.1.10_138449_el7-1.x86_64.rpm
+       #sudo /sbin/vboxconfig
+       
+       # Install vagrant for centos
+       wget https://releases.hashicorp.com/vagrant/2.2.9/vagrant_2.2.9_x86_64.rpm
+       sudo yum -y install vagrant_2.2.9_x86_64.rpm
+
+
+
+
+    SHELL
+
+  end # vm.define
+
+end # configure 
