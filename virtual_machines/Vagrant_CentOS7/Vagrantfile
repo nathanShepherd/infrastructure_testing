@@ -9,14 +9,79 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "server" do |server|
 
-    server.vm.box = "geerlingguy/centos7"
+    server.vm.box = "centos/7"
 
     server.vm.network "public_network", ip: "172.28.128.3" #type: "dhcp"
 
     server.vm.hostname = "server"
 
     server.vm.provision "shell", inline: <<-SHELL
-       sudo yum install -y git
+       sudo yum -y install docker
+       sudo docker pull perfsonar/testpoint
+
+       #sudo docker run -it perfsonar/testpoint /bin/bash
+       #sudo docker run --privileged -d --net=host perfsonar/testpoint
+       
+       # Configure yum repositories
+       #sudo yum -y install epel-release
+       #sudo yum -y install https://perfsonar-dev3.grnoc.iu.edu/nightly/el/7/x86_64/perfsonar/minor/packages/perfSONAR-repo-nightly-minor-0.9-1.noarch.rpm
+       #sudo yum clean all
+
+       # Install pS testpoint and GridFTP tools
+       #sudo yum -y install perfsonar-testpoint pscheduler-test-disk-to-disk pscheduler-tool-ftp pscheduler-tool-globus
+
+       # Install Ansible
+       #sudo yum -y install python python-pip
+       #sudo pip install ansible
+
+       #sudo yum install -y git docker
+       #sudo systemctl start docker
+       #git clone https://github.com/perfsonar/perfsonar-testpoint-docker.git
+       #cd perfsonar-testpoint-docker
+       #sudo make build
+       #cd ..
+
+       # Archiver using psconfig
+       #sudo yum -y install perfsonar-psconfig-publisher
+
+
+
+
+    SHELL
+
+  end # vm.define
+
+end # configure 
+
+
+Vagrant.configure("2") do |config|
+
+  config.vm.define "maddash" do |maddash|
+
+    maddash.vm.box = "geerlingguy/centos7"
+
+    maddash.vm.network "public_network", ip: "172.28.128.3" #type: "dhcp"
+
+    maddash.vm.hostname = "maddash"
+
+    maddash.vm.provision "shell", inline: <<-SHELL
+       sudo yum install -y git docker
+       sudo systemctl start docker
+
+       git clone https://github.com/perfsonar/perfsonar-testpoint-docker.git
+
+       cd perfsonar-testpoint-docker
+       git checkout tags/4.0.2.3
+       sudo make build
+       cd ..
+
+       # Configure maddash
+       sudo yum -y install perfsonar-psconfig-maddash
+
+
+
+
+
     SHELL
 
   end # vm.define

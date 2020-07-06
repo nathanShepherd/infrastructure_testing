@@ -52,6 +52,7 @@ def read_file(file_loc):
             file_loc = file_loc.split('/')[-4:]
             file_loc = str(file_loc[:2]) + '\n' + str(file_loc[-2:])
             print('\n%%%%% \n Interrupted TRex test at:\n', file_loc )
+            quit()
             #return pd.DataFrame({})
             
 

@@ -47,16 +47,19 @@ Vagrant.configure("2") do |config|
 
       guest.vm.provision "shell", inline: <<-SHELL
 
-        sudo curl -s -O https://raw.githubusercontent.com/perfsonar/pscheduler/master/scripts/system-prep
+	sudo yum install -y epel-release vim ansible git
 
-        sudo sh ./system-prep
+	sudo yum install https://perfsonar-dev3.grnoc.iu.edu/nightly/el/7/x86_64/perfsonar/minor/packages/perfSONAR-repo-nightly-minor-0.9-1.noarch.rpm
+	sudo yum install perfsonar-testpoint pscheduler-test-disk-to-disk pscheduler-tool-ftp pscheduler-tool-globus
+	wget "https://raw.githubusercontent.com/perfsonar/toolkit/release-4.0.2/etc/default_service_configs/pscheduler_limits.conf"
 
-        sudo yum install git
+	
+	cp pscheduler_limits.conf /etc/pscheduler/limits.conf
 
-        git clone https://github.com/perfsonar/pscheduler.git --branch issue-155
-        cd pscheduler
-        sudo make
-
+	git clone https://github.com/nathanShepherd/Playbook-setup-globus-server.git
+	cd Playbook-setup-globus-server
+	#ansible-playbook main.yml --user root --ask-pass
+	
         sudo systemctl stop firewalld
 
     SHELL

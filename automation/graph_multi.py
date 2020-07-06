@@ -302,7 +302,7 @@ def vendor_tx_viz(   test_name='multi_http_simple',
     merged = merged[cols]
     merged = merged.interpolate(method='linear', order=2)
 
-    ax1_label = 'Dell Cpu Utilization (%)'
+    ax1_label = 'Dell CPU Utilization (%)'
     plt.plot(merged['TxBw_port_1_x'], merged[cols[1]], color = 'purple',
                   label= 'Arista', marker='+')
     plt.plot(merged['TxBw_port_1_x'], merged[cols[0]], color = 'orange',
@@ -310,8 +310,8 @@ def vendor_tx_viz(   test_name='multi_http_simple',
     
     plt.ylim(-2, 100)
     plt.ylabel(ax1_label)
-    plt.xlabel("Dell Throughput (Gbps)")
-    plt.title('Vendor System Limit Comparison')
+    plt.xlabel("Dell Throughput (TRex Gbps)")
+    plt.title('Vendor System Limits (Dell)')
     
     plt.legend(loc='center right')
     plt.show()
@@ -512,11 +512,12 @@ def trex_viz_all_flows(vendor='Arista', all_flow_dir='All_Flows_28May2020'):
     #all_flows.plot.bar()
     #plt.show()
         
-def graph_flow_from_all(vendor='Arista',
-                                             all_flow_dir='All_Flows_28May2020'):
+def graph_flow_from_all(vendor='Cisco',
+                                             all_flow_dir='All_Flows_11Jun2020'):
     flows = ['cap2_imix_64_fast_yaml', 'cap2_imix_9k_yaml']
+    flow_labels = ['Complex traffic', 'Simple traffic']
     
-    test_dir = './../vendor_data/Arista/' + all_flow_dir + '/'
+    test_dir = f'./../vendor_data/{vendor}/{all_flow_dir}/'
     vendor += '/' + all_flow_dir
     flow_arr = []
     
@@ -529,20 +530,50 @@ def graph_flow_from_all(vendor='Arista',
             row_values = ((flow_multiples_dir[:-5] + ' ') * num_rows).split(' ')
             traffic_type = {'Traffic Type': row_values}
             max_df['Traffic Type'] = pd.DataFrame(traffic_type)
-        
+
+            max_df = max_df.groupby('TxBw_port_0').agg('min').reset_index()
+            
             flow_arr.append(max_df)
            # print(max_df.columns); quit()
-    all_flows = pd.concat(flow_arr)
 
-    print(all_flows.columns)
-    columns = ['CpuUtilization',
+    print(flow_arr)
+    columns = ['TxBw_port_0',
+                         'CpuUtilization',
+        
                         #'Total-Tx',
-                        #'average_latency_port_1','multiple'
+                        #'average_latency_port_1',#'multiple'
                         'Traffic Type', ]
-    all_flows = all_flows[columns]
-    print(all_flows)
-    all_flows.plot()
+    for i, df in enumerate(flow_arr):
+        
+        df = df[columns]
+        #df = df.set_index(columns[0])
+        flow_arr[i] = df
+        X = df[columns[0]]
+        y = df[columns[1]]
+        plt.plot(X, y, label=flow_labels[i])
     
+        #plt.plot(flow_arr[1][[columns[0]], flow_arr[1][[columns[1]], label= 'imix_9k')
+        #df.plot()
+    #plt.show()
+    #all_flows = pd.concat(flow_arr)
+    #print(all_flows)
+    plt.ylim(-2, 58)
+    plt.xlim(-0.2, 7.9)
+    plt.ylabel("Dell " + columns[1] + " (%)")
+    plt.xlabel('Dell Throughput (Gbps)')
+    plt.title(f"Comparing Different TRex Flows ({vendor.split('/')[0]} Only)")
+    plt.legend()
+    
+    plt.show()
+    #print(all_flows.columns)
+    
+    #all_flows = all_flows[columns]
+    
+    '''
+    all_flows[columns[1] == flows[0]].plot()
+    all_flows[columns[1] == flows[1]].plot()
+    plt.show()
+    '''
     
     
 
@@ -613,7 +644,7 @@ def graph_Simult_pS(vendor='Arista',
     
     
     y_axis= ['pS_throughput']    
-    x_axis = 'datetime' # 'TxBw_port_1' # 'datetime'
+    x_axis = 'TxBw_port_1' # 'TxBw_port_1' # 'datetime'
     aggregate = 'max'
 
     merged['TRex Throughput (Gbps)'] = merged[['TxBw_port_1']]
@@ -626,8 +657,10 @@ def graph_Simult_pS(vendor='Arista',
         graph_maxes.set_index('TRex Throughput (Gbps)', inplace=True)
         
         graph_maxes.plot()
+        
         plt.title(vendor + ' Throughput Comparison')
-        #plt.show()
+        plt.ylim(bottom=0) # top=
+        plt.show()
         
         #merged['TRex Throughput (Gbps)'] = merged['TRex Throughput (Gbps)'].rolling(1).max()
         x_axis ='TRex Throughput (Gbps)'
@@ -652,8 +685,10 @@ def graph_Simult_pS(vendor='Arista',
     
     print(merged.head())
     
-    merged.plot.bar(x_axis, y_axis[0:],)
-    plt.show()
+    #merged.plot.bar(x_axis, y_axis[0:],)
+    #merged = merged.groupby(x_axis
+    #merged.plot(x_axis, y_axis[0:],)
+    #plt.show()
 
     #import pdb; pdb.set_trace()
     
@@ -723,11 +758,11 @@ def graph_Simult_pS(vendor='Arista',
     '''
     
 if __name__ == "__main__":
-    #graph_flow_from_all()
     #trex_viz_all_flows()
+    graph_flow_from_all()
     
     #TRex_viz_main()
-    vendor_tx_viz()
+    #vendor_tx_viz()
     
     #graph_Simult_pS(vendor='Arista')
 
